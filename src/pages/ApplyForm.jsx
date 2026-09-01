@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { CheckCircle2, MessageCircle, Lock, ShieldCheck, BadgeCheck } from "lucide-react";
+import { CheckCircle2, MessageCircle, Lock, ShieldCheck, BadgeCheck, Loader2 } from "lucide-react";
 import { LOAN_TYPES } from "../data";
 import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass } from "../components/ui";
+import { submitLead } from "../api";
 
 function useCountdown(startSeconds) {
   const [seconds, setSeconds] = useState(startSeconds);
@@ -20,7 +21,10 @@ export default function ApplyForm() {
   const [params] = useSearchParams();
   const defaultLoan = LOAN_TYPES.find((l) => l.id === params.get("loan"))?.title || "Personal Loan";
   const [form, setForm] = useState({ name: "", phone: "", loanType: defaultLoan, amount: "" });
+  const phoneValid = /^\d{10}$/.test(form.phone);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const refId = useRef(`ARC-${Math.floor(100000 + Math.random() * 900000)}`);
   const countdown = useCountdown(30 * 60);
 
@@ -80,9 +84,24 @@ export default function ApplyForm() {
         <span className="text-[11px] font-bold text-gold-dark uppercase tracking-wide">Step 1 of 2</span>
 
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            setSubmitted(true);
+            setError("");
+            setSubmitting(true);
+            try {
+              await submitLead({
+                source: "apply",
+                name: form.name,
+                phone: form.phone,
+                loanType: form.loanType,
+                amount: form.amount,
+              });
+              setSubmitted(true);
+            } catch (err) {
+              setError(err.message);
+            } finally {
+              setSubmitting(false);
+            }
           }}
           className="mt-3 space-y-4"
         >
@@ -99,11 +118,16 @@ export default function ApplyForm() {
             <input
               required
               type="tel"
+              inputMode="numeric"
+              maxLength={10}
               value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
               placeholder="98290XXXXX"
               className={inputClass}
             />
+            {form.phone.length > 0 && !phoneValid && (
+              <p className="text-[11px] text-warn mt-1">Enter a valid 10-digit mobile number.</p>
+            )}
           </Field>
           <Field label="Loan Type" required>
             <select
@@ -126,8 +150,15 @@ export default function ApplyForm() {
               className={inputClass}
             />
           </Field>
-          <PrimaryButton type="submit" full>
-            Get My Instant Approval
+          {error && <p className="text-xs text-warn text-center">{error}</p>}
+          <PrimaryButton type="submit" full disabled={submitting || !phoneValid}>
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
+              </>
+            ) : (
+              "Get My Instant Approval"
+            )}
           </PrimaryButton>
         </form>
         <p className="mt-4 text-[11px] text-ink/45 text-center">

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CreditCard, Landmark, ShoppingBag, Plus, X, ArrowLeftRight, ClipboardList, ChevronDown, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { BackLink, PrimaryButton, Field, inputClass, AccordionPanel } from "../components/ui";
+import { submitLead } from "../api";
 
 const ICONS = [CreditCard, Landmark, ShoppingBag];
 
@@ -33,6 +34,10 @@ export default function DebtConsolidation() {
   const [submitted, setSubmitted] = useState(false);
   const [consolidating, setConsolidating] = useState(false);
   const [reduction, setReduction] = useState(null);
+  const [contact, setContact] = useState({ name: "", phone: "" });
+  const phoneValid = /^\d{10}$/.test(contact.phone);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   function addDebt() {
     setReduction(null);
@@ -248,21 +253,69 @@ export default function DebtConsolidation() {
               Data collection only — no auto-scoring, no automatic plan. An advisor reviews your full debt list personally.
             </p>
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                setSubmitted(true);
+                setSubmitError("");
+                setSubmitting(true);
+                try {
+                  await submitLead({
+                    source: "debt_consolidation",
+                    name: contact.name,
+                    phone: contact.phone,
+                    details: {
+                      debts: debts.map((d) => ({
+                        type: d.type,
+                        principal: d.principal,
+                        rate: d.rate,
+                        monthlyPayment: d.payment,
+                      })),
+                      estimatedReductionPct: reduction,
+                    },
+                  });
+                  setSubmitted(true);
+                } catch (err) {
+                  setSubmitError(err.message);
+                } finally {
+                  setSubmitting(false);
+                }
               }}
               className="grid sm:grid-cols-2 gap-4"
             >
               <Field label="Full Name" required>
-                <input required type="text" placeholder="e.g. Rajesh Sharma" className={inputClass} />
+                <input
+                  required
+                  type="text"
+                  value={contact.name}
+                  onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                  placeholder="e.g. Rajesh Sharma"
+                  className={inputClass}
+                />
               </Field>
               <Field label="Mobile Number (+91)" required>
-                <input required type="tel" placeholder="98290XXXXX" className={inputClass} />
+                <input
+                  required
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={contact.phone}
+                  onChange={(e) => setContact({ ...contact, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                  placeholder="98290XXXXX"
+                  className={inputClass}
+                />
+                {contact.phone.length > 0 && !phoneValid && (
+                  <p className="text-[11px] text-warn mt-1">Enter a valid 10-digit mobile number.</p>
+                )}
               </Field>
+              {submitError && <p className="text-xs text-warn sm:col-span-2">{submitError}</p>}
               <div className="sm:col-span-2">
-                <PrimaryButton type="submit" full>
-                  Get My Advisor's Recommendation
+                <PrimaryButton type="submit" full disabled={submitting || !phoneValid}>
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
+                    </>
+                  ) : (
+                    "Get My Advisor's Recommendation"
+                  )}
                 </PrimaryButton>
               </div>
             </form>

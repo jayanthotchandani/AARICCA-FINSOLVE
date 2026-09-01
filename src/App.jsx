@@ -16,7 +16,7 @@ import LeadQueue from "./pages/LeadQueue.jsx";
 export default function App() {
   return (
     <Routes>
-      <Route path="/admin/queue" element={<LeadQueue />} />
+      <Route path="/internal-leads-portal" element={<LeadQueue />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/loans/:loanId" element={<LoanProductPage />} />

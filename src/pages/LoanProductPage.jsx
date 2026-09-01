@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
-import { ChevronDown, Check, CheckCircle2 } from "lucide-react";
+import { ChevronDown, Check, CheckCircle2, Loader2 } from "lucide-react";
 import { LOAN_TYPES, BANKS_BY_LOAN } from "../data";
 import { BackLink, PrimaryButton, Field, inputClass } from "../components/ui";
+import { submitLead } from "../api";
 
 function formatINR(n) {
   return "₹" + Math.round(n).toLocaleString("en-IN");
@@ -37,6 +38,10 @@ export default function LoanProductPage() {
   }, [amount, rate, tenureYears]);
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [eligForm, setEligForm] = useState({ name: "", phone: "", income: "", employment: "Salaried", debts: "" });
+  const phoneValid = /^\d{10}$/.test(eligForm.phone);
 
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
@@ -139,37 +144,103 @@ export default function LoanProductPage() {
               Data collection only — this does not auto-score or auto-reject you. An advisor reviews your full profile personally.
             </p>
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                setSubmitted(true);
+                setError("");
+                setSubmitting(true);
+                try {
+                  await submitLead({
+                    source: "apply",
+                    name: eligForm.name,
+                    phone: eligForm.phone,
+                    loanType: loan.title,
+                    amount: formatINR(amount),
+                    details: {
+                      bank: bank.name,
+                      rate: `${rate.toFixed(2)}%`,
+                      tenureYears,
+                      monthlyIncome: eligForm.income,
+                      employment: eligForm.employment,
+                      existingDebts: eligForm.debts || null,
+                    },
+                  });
+                  setSubmitted(true);
+                } catch (err) {
+                  setError(err.message);
+                } finally {
+                  setSubmitting(false);
+                }
               }}
               className="space-y-4"
             >
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="Full Name" required>
-                  <input required type="text" placeholder="e.g. Rajesh Sharma" className={inputClass} />
+                  <input
+                    required
+                    type="text"
+                    value={eligForm.name}
+                    onChange={(e) => setEligForm({ ...eligForm, name: e.target.value })}
+                    placeholder="e.g. Rajesh Sharma"
+                    className={inputClass}
+                  />
                 </Field>
                 <Field label="Mobile Number (+91)" required>
-                  <input required type="tel" placeholder="98290XXXXX" className={inputClass} />
+                  <input
+                    required
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={eligForm.phone}
+                    onChange={(e) => setEligForm({ ...eligForm, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                    placeholder="98290XXXXX"
+                    className={inputClass}
+                  />
+                  {eligForm.phone.length > 0 && !phoneValid && (
+                    <p className="text-[11px] text-warn mt-1">Enter a valid 10-digit mobile number.</p>
+                  )}
                 </Field>
               </div>
               <div className="grid sm:grid-cols-3 gap-4">
                 <Field label="Monthly Income (₹)" required>
-                  <input required type="number" placeholder="75,000" className={inputClass} />
+                  <input
+                    required
+                    type="number"
+                    value={eligForm.income}
+                    onChange={(e) => setEligForm({ ...eligForm, income: e.target.value })}
+                    placeholder="75,000"
+                    className={inputClass}
+                  />
                 </Field>
                 <Field label="Employment Type">
-                  <select className={inputClass} defaultValue="Salaried">
+                  <select
+                    value={eligForm.employment}
+                    onChange={(e) => setEligForm({ ...eligForm, employment: e.target.value })}
+                    className={inputClass}
+                  >
                     <option>Salaried</option>
                     <option>Business / Self-Employed</option>
                     <option>Doctor / CA / Lawyer</option>
                   </select>
                 </Field>
                 <Field label="Existing Debts (₹)" hint="Optional">
-                  <input type="number" placeholder="Optional" className={inputClass} />
+                  <input
+                    type="number"
+                    value={eligForm.debts}
+                    onChange={(e) => setEligForm({ ...eligForm, debts: e.target.value })}
+                    placeholder="Optional"
+                    className={inputClass}
+                  />
                 </Field>
               </div>
-              <PrimaryButton type="submit" full>
-                Get Best Options from Our Advisor
+              {error && <p className="text-xs text-warn">{error}</p>}
+              <PrimaryButton type="submit" full disabled={submitting || !phoneValid}>
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
+                  </>
+                ) : (
+                  "Get Best Options from Our Advisor"
+                )}
               </PrimaryButton>
               <ul className="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-ink/55 pt-1">
                 <li className="flex items-center gap-1"><Check className="w-3 h-3 text-teal" /> Soft inquiry — no impact to your score</li>

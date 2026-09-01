@@ -4,6 +4,7 @@ import { ShieldCheck } from "lucide-react";
 import { SCORE_TIERS } from "../data";
 import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass } from "../components/ui";
 import ScoreGauge, { tierForScore } from "../components/ScoreGauge";
+import { submitLead } from "../api";
 
 const TIER_STYLES = {
   excellent: { bg: "#EAF6F5", border: "#1B7F7E33", text: "#155F5E" },
@@ -14,18 +15,31 @@ const TIER_STYLES = {
 
 export default function CheckScore() {
   const [form, setForm] = useState({ name: "", phone: "", email: "", income: "80000", employment: "salaried" });
+  const phoneValid = /^\d{10}$/.test(form.phone);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await submitLead({
+        source: "check_score",
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        details: { monthlyIncome: form.income, employment: form.employment },
+      });
       const inc = parseInt(form.income, 10) || 50000;
       const score = inc > 100000 ? 795 : inc > 60000 ? 742 : 668;
       setResult(score);
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   }
 
   const tier = result ? tierForScore(result) : null;
@@ -40,27 +54,7 @@ export default function CheckScore() {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-teal/12 p-6 sm:p-8 mb-8">
-        <h2 className="font-display font-semibold text-teal-dark mb-1">Understanding the score bands (300–900)</h2>
-        <p className="text-xs text-ink/60 mb-5">Banks evaluate repayment discipline across four bureau tiers:</p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {SCORE_TIERS.map((t) => {
-            const s = TIER_STYLES[t.tone];
-            return (
-              <div key={t.label} className="p-4 rounded-xl border" style={{ backgroundColor: s.bg, borderColor: s.border }}>
-                <p className="text-xs font-extrabold uppercase" style={{ color: s.text }}>
-                  {t.range} — {t.label}
-                </p>
-                <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: s.text }}>
-                  {t.note}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl border-2 border-teal/15 p-6 sm:p-8">
+      <div className="bg-white rounded-2xl border-2 border-teal/15 p-6 sm:p-8 mb-8">
         {!result ? (
           <>
             <span className="text-[11px] font-bold text-gold-dark uppercase tracking-wide">Step 1 of 2</span>
@@ -81,11 +75,16 @@ export default function CheckScore() {
                   <input
                     required
                     type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
                     value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
                     placeholder="98290XXXXX"
                     className={inputClass}
                   />
+                  {form.phone.length > 0 && !phoneValid && (
+                    <p className="text-[11px] text-warn mt-1">Enter a valid 10-digit mobile number.</p>
+                  )}
                 </Field>
               </div>
               <div className="grid sm:grid-cols-3 gap-4">
@@ -121,7 +120,8 @@ export default function CheckScore() {
                   />
                 </Field>
               </div>
-              <PrimaryButton type="submit" full>
+              {error && <p className="text-xs text-warn text-center">{error}</p>}
+              <PrimaryButton type="submit" full disabled={loading || !phoneValid}>
                 {loading ? "Generating your report…" : "Unlock My Free Credit Report & Bank Pre-Approvals"}
               </PrimaryButton>
               <p className="flex items-center gap-1.5 text-[11px] text-ink/50 justify-center">
@@ -159,6 +159,26 @@ export default function CheckScore() {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="bg-white rounded-2xl border border-teal/12 p-6 sm:p-8">
+        <h2 className="font-display font-semibold text-teal-dark mb-1">Understanding the score bands (300–900)</h2>
+        <p className="text-xs text-ink/60 mb-5">Banks evaluate repayment discipline across four bureau tiers:</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {SCORE_TIERS.map((t) => {
+            const s = TIER_STYLES[t.tone];
+            return (
+              <div key={t.label} className="p-4 rounded-xl border" style={{ backgroundColor: s.bg, borderColor: s.border }}>
+                <p className="text-xs font-extrabold uppercase" style={{ color: s.text }}>
+                  {t.range} — {t.label}
+                </p>
+                <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: s.text }}>
+                  {t.note}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

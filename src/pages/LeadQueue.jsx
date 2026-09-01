@@ -1,101 +1,198 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Download, Lock, Trophy, PhoneCall } from "lucide-react";
+import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail } from "lucide-react";
 import { inputClass, Field, PrimaryButton } from "../components/ui";
 
-const LEADS = [
-  { name: "Rajesh Sharma", phone: "98290 12345", loan: "Home Loan", amount: "₹45L", cibil: 782, income: "₹1.2L/mo", waiting: "4 min", status: "URGENT" },
-  { name: "Priya Nair", phone: "99887 65432", loan: "Personal Loan", amount: "₹8L", cibil: 705, income: "₹62K/mo", waiting: "1 min", status: "NEW" },
-  { name: "Amit Verma", phone: "97123 45678", loan: "Business Loan", amount: "₹25L", cibil: 740, income: "₹95K/mo", waiting: "12 min", status: "QUALIFIED" },
-  { name: "Sunita Rao", phone: "96543 21098", loan: "Education Loan", amount: "₹18L", cibil: 690, income: "₹58K/mo", waiting: "22 min", status: "ASSIGNED" },
-  { name: "Vikram Singh", phone: "95012 34567", loan: "MSME Loan", amount: "₹30L", cibil: 715, income: "₹1.4L/mo", waiting: "6 min", status: "QUALIFIED" },
-  { name: "Meera Iyer", phone: "94321 09876", loan: "Loan Against Property", amount: "₹60L", cibil: 760, income: "₹2L/mo", waiting: "2 min", status: "URGENT" },
-];
-
-const TOP_LEADS = [
-  { rank: 1, name: "Meera Iyer", detail: "LAP · ₹60L · CIBIL 760", tag: "Highest Ticket Value" },
-  { rank: 2, name: "Rajesh Sharma", detail: "Home Loan · ₹45L · CIBIL 782", tag: "Best CIBIL + Urgent" },
-  { rank: 3, name: "Vikram Singh", detail: "MSME Loan · ₹30L · CIBIL 715", tag: "Qualified, High Income" },
-];
-
-const STATUS_STYLES = {
-  URGENT: "bg-warn/10 text-warn",
-  NEW: "bg-success/10 text-success",
-  QUALIFIED: "bg-gold/15 text-gold-dark",
-  ASSIGNED: "bg-teal/10 text-teal",
+const SOURCE_LABELS = {
+  apply: "Loan Application",
+  debt_consolidation: "Debt Consolidation",
+  check_score: "Credit Score Check",
 };
 
-const ROUTING_RULES = [
-  ["CIBIL 750+", "Fast Track (24h)"],
-  ["CIBIL 700–749", "Standard (48h)"],
-  ["Home Loan > ₹50L", "Senior Agent"],
-  ["No response in 30 min", "WhatsApp reminder"],
-];
+const SOURCE_STYLES = {
+  apply: "bg-teal/10 text-teal",
+  debt_consolidation: "bg-gold/15 text-gold-dark",
+  check_score: "bg-success/10 text-success",
+};
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+function daysAgoISO(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0, 10);
+}
 
 export default function LeadQueue() {
+  const [authChecked, setAuthChecked] = useState(false);
   const [authed, setAuthed] = useState(false);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
 
-  if (!authed) {
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => setAuthed(d.authenticated))
+      .finally(() => setAuthChecked(true));
+  }, []);
+
+  if (!authChecked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream px-5">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (password === "aaricca2026") {
-              setAuthed(true);
-            } else {
-              setError(true);
-            }
-          }}
-          className="bg-white rounded-2xl border border-teal/15 p-8 w-full max-w-sm shadow-raised"
-        >
-          <div className="w-11 h-11 rounded-xl bg-teal/10 text-teal flex items-center justify-center mb-4">
-            <Lock className="w-5 h-5" />
-          </div>
-          <h1 className="font-display font-bold text-lg text-teal-dark">Internal Tool</h1>
-          <p className="text-xs text-ink/55 mt-1 mb-5">Call Center Lead Queue — authorized staff only.</p>
-          <Field label="Access Password" required>
-            <input
-              autoFocus
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError(false);
-              }}
-              placeholder="Demo password: aaricca2026"
-              className={inputClass}
-            />
-          </Field>
-          {error && <p className="text-xs text-warn mt-2">Incorrect password.</p>}
-          <PrimaryButton type="submit" full className="mt-4">
-            Enter Queue
-          </PrimaryButton>
-          <Link to="/" className="block text-center text-xs text-ink/45 mt-4 hover:text-teal">
-            ← Back to public site
-          </Link>
-        </form>
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <Loader2 className="w-6 h-6 text-teal animate-spin" />
       </div>
     );
   }
 
+  return authed ? <Dashboard onLoggedOut={() => setAuthed(false)} /> : <LoginGate onLoggedIn={() => setAuthed(true)} />;
+}
+
+function LoginGate({ onLoggedIn }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Login failed");
+      }
+      onLoggedIn();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-cream px-5">
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-teal/15 p-8 w-full max-w-sm shadow-raised">
+        <div className="w-11 h-11 rounded-xl bg-teal/10 text-teal flex items-center justify-center mb-4">
+          <Lock className="w-5 h-5" />
+        </div>
+        <h1 className="font-display font-bold text-lg text-teal-dark">Internal Tool</h1>
+        <p className="text-xs text-ink/55 mt-1 mb-5">Call Center Lead Queue — authorized staff only.</p>
+
+        <div className="space-y-3.5">
+          <Field label="Username" required>
+            <input
+              autoFocus
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError("");
+              }}
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Password" required>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
+              className={inputClass}
+            />
+          </Field>
+        </div>
+        {error && <p className="text-xs text-warn mt-3">{error}</p>}
+        <PrimaryButton type="submit" full disabled={loading} className="mt-4">
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" /> Signing in…
+            </>
+          ) : (
+            "Enter Queue"
+          )}
+        </PrimaryButton>
+        <Link to="/" className="block text-center text-xs text-ink/45 mt-4 hover:text-teal">
+          ← Back to public site
+        </Link>
+      </form>
+    </div>
+  );
+}
+
+function Dashboard({ onLoggedOut }) {
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [justArrivedId, setJustArrivedId] = useState(null);
+  const eventSourceRef = useRef(null);
+
+  const loadLeads = useCallback(() => {
+    fetch("/api/leads")
+      .then((r) => r.json())
+      .then(setLeads)
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    loadLeads();
+    // Live updates: a new submission from anywhere on the public site
+    // appears here immediately, without a refresh.
+    const es = new EventSource("/api/leads/stream");
+    eventSourceRef.current = es;
+    es.onmessage = (e) => {
+      const lead = JSON.parse(e.data);
+      setLeads((prev) => [lead, ...prev]);
+      setJustArrivedId(lead.id);
+      setTimeout(() => setJustArrivedId((id) => (id === lead.id ? null : id)), 2000);
+    };
+    return () => es.close();
+  }, [loadLeads]);
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    onLoggedOut();
+  }
+
+  const today = todayISO();
+  const leadsToday = leads.filter((l) => l.created_at.slice(0, 10) === today).length;
+  const bySource = leads.reduce((acc, l) => {
+    acc[l.source] = (acc[l.source] || 0) + 1;
+    return acc;
+  }, {});
+
   return (
     <div className="min-h-screen bg-cream">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-start sm:items-center justify-between mb-6 gap-4 flex-col sm:flex-row">
           <div>
-            <p className="text-[11px] font-semibold text-ink/45 uppercase tracking-wide">Internal Tool · /admin/queue</p>
+            <p className="text-[11px] font-semibold text-ink/45 uppercase tracking-wide">Internal Tool · /internal-leads-portal</p>
             <h1 className="font-display font-bold text-2xl text-teal-dark">Call Center Lead Queue</h1>
           </div>
-          <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-ink/5 text-ink/60">
-            <Lock className="w-3 h-3" /> Password Protected
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success/10 text-success">
+              <Radio className="w-3 h-3" /> Live
+            </span>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-ink/5 text-ink/60 hover:bg-ink/10 transition-colors"
+            >
+              <LogOut className="w-3 h-3" /> Log Out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          {[["47", "Leads Today"], ["12", "In Queue"], ["₹3.8Cr", "Potential Value"], ["24%", "Conversion Rate"]].map(([v, l]) => (
+          {[
+            [leads.length, "Total Leads"],
+            [leadsToday, "Leads Today"],
+            [bySource.apply || 0, "Loan Applications"],
+            [(bySource.debt_consolidation || 0) + (bySource.check_score || 0), "Score Checks + Debt"],
+          ].map(([v, l]) => (
             <div key={l} className="bg-white rounded-xl border border-teal/12 p-4 text-center">
               <p className="font-display font-bold text-2xl text-teal-dark">{v}</p>
               <p className="text-[11px] text-ink/50 mt-0.5">{l}</p>
@@ -105,91 +202,95 @@ export default function LeadQueue() {
 
         <ExportBar />
 
-        <div className="mb-8">
-          <h2 className="flex items-center gap-2 font-display font-semibold text-ink mb-3">
-            <Trophy className="w-4 h-4 text-gold-dark" /> Today's Top Leads — Best Contenders
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-3">
-            {TOP_LEADS.map((lead) => (
-              <div key={lead.rank} className="bg-white rounded-xl border-2 border-gold/40 p-4">
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gold text-white text-xs font-bold mb-2">
-                  {lead.rank}
-                </span>
-                <p className="font-semibold text-sm text-ink">{lead.name}</p>
-                <p className="text-xs text-ink/55">{lead.detail}</p>
-                <p className="text-[11px] font-semibold text-gold-dark mt-1">{lead.tag}</p>
-              </div>
+        <h2 className="font-display font-semibold text-ink mb-3">Live Feed — All Leads</h2>
+        {loading ? (
+          <div className="flex items-center justify-center py-16 text-ink/40">
+            <Loader2 className="w-5 h-5 animate-spin" />
+          </div>
+        ) : leads.length === 0 ? (
+          <div className="bg-white rounded-xl border border-teal/12 p-10 text-center text-sm text-ink/50">
+            No leads yet. Submissions from the site's forms will appear here the moment they come in.
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {leads.map((lead) => (
+              <LeadCard key={lead.id} lead={lead} justArrived={lead.id === justArrivedId} />
             ))}
           </div>
-          <p className="text-[11px] text-ink/45 mt-2">
-            Auto-ranked by ticket value, CIBIL, and urgency — a "call these first" shortlist, separate from the full queue below.
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3">
-            <h2 className="font-display font-semibold text-ink mb-3">Active Queue — All Leads</h2>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {LEADS.map((lead) => (
-                <div key={lead.phone} className="bg-white rounded-xl border border-teal/12 p-4">
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <p className="font-semibold text-sm text-ink">{lead.name}</p>
-                      <p className="text-xs text-ink/50">{lead.phone}</p>
-                    </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${STATUS_STYLES[lead.status]}`}>
-                      {lead.status}
-                    </span>
-                  </div>
-                  <p className="text-xs text-ink/70 mt-2">
-                    {lead.loan} · {lead.amount} <span className="text-ink/40">·</span> CIBIL {lead.cibil}
-                  </p>
-                  <p className="text-xs text-ink/50">Income: {lead.income} · Waiting: {lead.waiting}</p>
-                  <button className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-teal text-white text-xs font-semibold hover:bg-teal-dark transition-colors">
-                    <PhoneCall className="w-3.5 h-3.5" /> Call Now
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h2 className="font-display font-semibold text-ink mb-3">Smart Routing Rules</h2>
-            <div className="bg-white rounded-xl border border-teal/12 p-4 space-y-2.5">
-              {ROUTING_RULES.map(([cond, action]) => (
-                <div key={cond} className="text-xs">
-                  <span className="text-ink/55">{cond}</span>
-                  <span className="text-ink/30 mx-1">→</span>
-                  <span className="font-semibold text-teal-dark">{action}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
 }
 
-function toCsv() {
-  const header = ["Name", "Phone", "Loan Type", "Amount", "CIBIL", "Income", "Waiting", "Status"];
-  const rows = LEADS.map((l) => [l.name, l.phone, l.loan, l.amount, l.cibil, l.income, l.waiting, l.status]);
-  return [header, ...rows].map((r) => r.join(",")).join("\n");
+function LeadCard({ lead, justArrived }) {
+  const details = lead.details_json ? JSON.parse(lead.details_json) : null;
+  const time = new Date(lead.created_at).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return (
+    <div
+      className="bg-white rounded-xl border border-teal/12 p-4 transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+      style={justArrived ? { borderColor: "#1B7F7E", boxShadow: "0 0 0 3px #1B7F7E22" } : undefined}
+    >
+      <div className="flex items-start justify-between mb-1.5">
+        <div>
+          <p className="font-semibold text-sm text-ink">{lead.name}</p>
+          <p className="text-xs text-ink/50">{lead.phone}</p>
+        </div>
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${SOURCE_STYLES[lead.source]}`}>
+          {SOURCE_LABELS[lead.source] || lead.source}
+        </span>
+      </div>
+
+      {lead.loan_type && (
+        <p className="text-xs text-ink/70 mt-2">
+          {lead.loan_type} {lead.amount && <>· {lead.amount}</>}
+        </p>
+      )}
+      {lead.email && (
+        <p className="text-xs text-ink/50 flex items-center gap-1 mt-1">
+          <Mail className="w-3 h-3" /> {lead.email}
+        </p>
+      )}
+      {details && (
+        <ul className="mt-1.5 space-y-0.5">
+          {Object.entries(details)
+            .filter(([, v]) => v !== null && v !== undefined && v !== "")
+            .slice(0, 3)
+            .map(([k, v]) => (
+              <li key={k} className="text-[11px] text-ink/50">
+                <span className="capitalize">{k.replace(/([A-Z])/g, " $1")}</span>: {typeof v === "object" ? JSON.stringify(v) : String(v)}
+              </li>
+            ))}
+        </ul>
+      )}
+
+      <p className="text-[11px] text-ink/40 mt-2">{time}</p>
+
+      <a
+        href={`tel:+91${String(lead.phone).replace(/\D/g, "")}`}
+        className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-teal text-white text-xs font-semibold hover:bg-teal-dark transition-colors"
+      >
+        <PhoneCall className="w-3.5 h-3.5" /> Call Now
+      </a>
+    </div>
+  );
 }
 
 function ExportBar() {
-  const [from, setFrom] = useState("2026-08-01");
-  const [to, setTo] = useState("2026-08-29");
+  const [from, setFrom] = useState(daysAgoISO(30));
+  const [to, setTo] = useState(todayISO());
 
   function download() {
-    const blob = new Blob([toCsv()], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `aaricca-leads-${from}-to-${to}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    const params = new URLSearchParams();
+    if (from) params.set("from", `${from}T00:00:00.000Z`);
+    if (to) params.set("to", `${to}T23:59:59.999Z`);
+    window.location.href = `/api/leads/export.csv?${params.toString()}`;
   }
 
   return (

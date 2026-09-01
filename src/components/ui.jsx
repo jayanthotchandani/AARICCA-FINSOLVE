@@ -13,8 +13,8 @@ export function AccordionPanel({ open, children, className = "", as: Tag = "div"
   );
 }
 
-export function PrimaryButton({ to, onClick, children, type = "button", className = "", full = false }) {
-  const cls = `inline-flex ${full ? "w-full justify-center" : ""} items-center gap-2 px-6 py-3.5 rounded-xl bg-teal text-white font-semibold text-sm hover:bg-teal-dark active:scale-[0.97] transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-card ${className}`;
+export function PrimaryButton({ to, onClick, children, type = "button", className = "", full = false, disabled = false }) {
+  const cls = `inline-flex ${full ? "w-full justify-center" : ""} items-center gap-2 px-6 py-3.5 rounded-xl bg-teal text-white font-semibold text-sm hover:bg-teal-dark active:scale-[0.97] transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-card disabled:opacity-70 disabled:cursor-wait ${className}`;
   if (to) {
     return (
       <Link to={to} className={cls}>
@@ -23,7 +23,7 @@ export function PrimaryButton({ to, onClick, children, type = "button", classNam
     );
   }
   return (
-    <button type={type} onClick={onClick} className={cls}>
+    <button type={type} onClick={onClick} disabled={disabled} className={cls}>
       {children}
     </button>
   );
