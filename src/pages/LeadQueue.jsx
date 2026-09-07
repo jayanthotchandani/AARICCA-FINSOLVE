@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail } from "lucide-react";
+import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail, Trash2 } from "lucide-react";
 import { inputClass, Field, PrimaryButton } from "../components/ui";
 
 const SOURCE_LABELS = {
@@ -158,6 +158,12 @@ function Dashboard({ onLoggedOut }) {
     onLoggedOut();
   }
 
+  async function handleDelete(id) {
+    if (!window.confirm("Delete this lead? This can't be undone.")) return;
+    const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
+    if (res.ok) setLeads((prev) => prev.filter((l) => l.id !== id));
+  }
+
   const today = todayISO();
   const leadsToday = leads.filter((l) => l.created_at.slice(0, 10) === today).length;
   const bySource = leads.reduce((acc, l) => {
@@ -214,7 +220,7 @@ function Dashboard({ onLoggedOut }) {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {leads.map((lead) => (
-              <LeadCard key={lead.id} lead={lead} justArrived={lead.id === justArrivedId} />
+              <LeadCard key={lead.id} lead={lead} justArrived={lead.id === justArrivedId} onDelete={handleDelete} />
             ))}
           </div>
         )}
@@ -223,7 +229,7 @@ function Dashboard({ onLoggedOut }) {
   );
 }
 
-function LeadCard({ lead, justArrived }) {
+function LeadCard({ lead, justArrived, onDelete }) {
   const details = lead.details_json ? JSON.parse(lead.details_json) : null;
   const time = new Date(lead.created_at).toLocaleString("en-IN", {
     day: "2-digit",
@@ -234,10 +240,18 @@ function LeadCard({ lead, justArrived }) {
 
   return (
     <div
-      className="bg-white rounded-xl border border-teal/12 p-4 transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+      className="group relative bg-white rounded-xl border border-teal/12 p-4 transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
       style={justArrived ? { borderColor: "#1B7F7E", boxShadow: "0 0 0 3px #1B7F7E22" } : undefined}
     >
-      <div className="flex items-start justify-between mb-1.5">
+      <button
+        onClick={() => onDelete(lead.id)}
+        aria-label="Delete lead"
+        className="absolute top-2.5 end-2.5 w-6 h-6 rounded-md flex items-center justify-center text-ink/30 opacity-0 group-hover:opacity-100 hover:bg-warn/10 hover:text-warn transition-[opacity,background-color,color] duration-150"
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </button>
+
+      <div className="flex items-start justify-between mb-1.5 pe-6">
         <div>
           <p className="font-semibold text-sm text-ink">{lead.name}</p>
           <p className="text-xs text-ink/50">{lead.phone}</p>

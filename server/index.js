@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { insertLead, listLeads } from "./db.js";
+import { insertLead, listLeads, deleteLead } from "./db.js";
 import { checkCredentials, issueSession, clearSession, requireAuth, isAuthed } from "./auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -79,6 +79,12 @@ app.get("/api/leads/stream", requireAuth, (req, res) => {
   res.write("retry: 3000\n\n");
   sseClients.add(res);
   req.on("close", () => sseClients.delete(res));
+});
+
+app.delete("/api/leads/:id", requireAuth, (req, res) => {
+  const ok = deleteLead(Number(req.params.id));
+  if (!ok) return res.status(404).json({ error: "Lead not found" });
+  res.json({ ok: true });
 });
 
 app.get("/api/leads/export.csv", requireAuth, (req, res) => {

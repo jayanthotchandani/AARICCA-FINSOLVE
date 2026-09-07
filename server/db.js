@@ -61,4 +61,9 @@ export function listLeads({ from, to, source } = {}) {
   return db.prepare(query).all(params);
 }
 
+export function deleteLead(id) {
+  const info = db.prepare("DELETE FROM leads WHERE id = ?").run(id);
+  return info.changes > 0;
+}
+
 export default db;
