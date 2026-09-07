@@ -7,3 +7,4 @@ dist-ssr
 .env
 server/leads.db
 server/leads.db-*
+.serena/
