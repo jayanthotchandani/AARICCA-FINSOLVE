@@ -1,9 +1,14 @@
 import "dotenv/config";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { insertLead, listLeads } from "./db.js";
 import { checkCredentials, issueSession, clearSession, requireAuth, isAuthed } from "./auth.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const distDir = path.join(__dirname, "..", "dist");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -99,6 +104,12 @@ app.get("/api/leads/export.csv", requireAuth, (req, res) => {
     "Content-Disposition": `attachment; filename="aaricca-leads-${fromLabel}-to-${toLabel}.csv"`,
   });
   res.send(csv);
+});
+
+// --- Production: serve the built frontend from the same server ---
+app.use(express.static(distDir));
+app.get(/^(?!\/api\/).*/, (req, res) => {
+  res.sendFile(path.join(distDir, "index.html"));
 });
 
 app.listen(PORT, () => {
