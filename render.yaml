@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: aaricca-finsales
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_PATH
+        value: /data/leads.db
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+    disk:
+      name: aaricca-data
+      mountPath: /data
+      sizeGB: 1
