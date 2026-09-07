@@ -1,18 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight, CheckCircle2, UserCheck, Scale, FileEdit, Landmark, ShieldCheck, Clock, Zap } from "lucide-react";
-import { LOAN_TYPES, TESTIMONIALS } from "../data";
+import { LOAN_TYPES, TESTIMONIALS, BANKS_BY_LOAN, RATE_BENCHMARK_UPDATED_AT } from "../data";
 import { PrimaryButton, SecondaryButton, StatBlock, ArrowCTA, Field, inputClass } from "../components/ui";
 import ScoreGauge, { tierForScore } from "../components/ScoreGauge";
 import ProcessPath from "../components/ProcessPath";
 import Reveal from "../components/Reveal";
 
-const RATE_ROWS = [
-  { id: "personal", label: "Personal Loan", rate: "10.99% onwards", speed: "Instant / 24 hrs" },
-  { id: "home", label: "Home Loan", rate: "8.40% onwards", speed: "3–5 Working Days" },
-  { id: "business", label: "Business Loan", rate: "11.50% onwards", speed: "48 Hours" },
-  { id: "lap", label: "Loan Against Property", rate: "9.25% onwards", speed: "5–7 Days" },
-];
+const BENCHMARK_LOAN_IDS = ["personal", "home", "business", "lap", "education"];
+const SPEED_BY_LOAN_ID = {
+  personal: "Instant / 24 hrs",
+  home: "3–5 Working Days",
+  business: "48 Hours",
+  lap: "5–7 Days",
+  education: "3–5 Working Days",
+};
+
+const RATE_ROWS = BENCHMARK_LOAN_IDS.map((id) => {
+  const loan = LOAN_TYPES.find((l) => l.id === id);
+  const lowest = Math.min(...BANKS_BY_LOAN[id].map((b) => b.rate));
+  return { id, label: loan.title, rate: `${lowest.toFixed(2)}% onwards`, speed: SPEED_BY_LOAN_ID[id] };
+});
+
+function formatUpdatedDate(iso) {
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
 
 const STEPS = [
   { n: "01", icon: UserCheck, title: "Eligibility", desc: "Tell us your requirement. Two minutes to fill basic details." },
@@ -53,11 +65,20 @@ export default function Home() {
 
           <div className="lg:col-span-5">
             <div className="bg-white rounded-2xl border border-teal/12 p-6 shadow-raised">
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between mb-1">
                 <h2 className="font-display font-semibold text-teal-dark">Live Bank Rate Benchmark</h2>
                 <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gold/15 text-gold-dark">
                   Zero Upfront Fees
                 </span>
+              </div>
+              <div className="flex items-center gap-1.5 mb-4">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
+                </span>
+                <p className="text-[11px] text-ink/50">
+                  Lowest starting rate across HDFC, ICICI, Axis &amp; SBI · Updated {formatUpdatedDate(RATE_BENCHMARK_UPDATED_AT)}
+                </p>
               </div>
               <div className="space-y-2.5">
                 {RATE_ROWS.map((row) => (
