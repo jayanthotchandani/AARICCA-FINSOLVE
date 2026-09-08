@@ -179,6 +179,39 @@ input[type="range"]::-webkit-slider-runnable-track {
   animation: accordion-in 180ms var(--ease-out) both;
 }
 
+/* Rotating rate-ticker value swap — each new item mounts fresh via a
+   changing `key`, so this animation replays automatically per item. */
+@keyframes rate-ticker-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.rate-ticker-in {
+  animation: rate-ticker-in 550ms var(--ease-out) both;
+}
+
+/* The rate number gets a slightly stronger entrance than the bank-name
+   label below it — no overshoot/bounce, just a firmer, more deliberate
+   settle so it reads as confident rather than playful. */
+@keyframes rate-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.rate-pop-in {
+  animation: rate-pop-in 450ms var(--ease-out) both;
+}
+
 /* Cross-fade for form -> success-state swaps. */
 .fade-swap-enter {
   animation: fade-swap-in 220ms var(--ease-out) both;
@@ -200,6 +233,8 @@ input[type="range"]::-webkit-slider-runnable-track {
   .animate-ticker,
   .rise-in,
   .fade-swap-enter,
+  .rate-ticker-in,
+  .rate-pop-in,
   .accordion-panel-content {
     animation: none !important;
   }

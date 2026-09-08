@@ -30,7 +30,7 @@ export const LOAN_TYPES = [
     icon: Briefcase,
     tagline: "Fuel working capital, purchase machinery, and scale your daily operations.",
     amount: "Up to ₹75 Lakhs",
-    rateFloor: 8.5,
+    rateFloor: 8.45,
     rateCeil: 17.5,
     tenure: "1–7 Years",
     approvalTime: "48–72 Hrs",
@@ -62,7 +62,7 @@ export const LOAN_TYPES = [
     icon: Building2,
     tagline: "Unlock high-value liquidity against your residential or commercial property.",
     amount: "Up to ₹10 Crores",
-    rateFloor: 8.95,
+    rateFloor: 8.45,
     rateCeil: 12.5,
     tenure: "Up to 15 Years",
     approvalTime: "5–7 Working Days",
@@ -106,60 +106,65 @@ export const LOAN_TYPES = [
   },
 ];
 
-// Researched starting rates for the 4 benchmark banks, current as of Sept 2026.
-// Update this list whenever rates change — it drives both the homepage
-// "Live Bank Rate Benchmark" panel and each product page's bank selector.
+// Researched starting rates, current as of Sept 2026. Update this list
+// whenever rates change — it drives both the homepage "Live Bank Rate
+// Benchmark" panel and each product page's bank selector.
+//
+// Note: Education Loan intentionally lists only 4 lenders — Bajaj Finserv,
+// Tata Capital, Kotak Mahindra, and IDFC FIRST don't run mainstream retail
+// education loan products the way the big public banks do, so no rate is
+// listed for them rather than guessing one.
 export const RATE_BENCHMARK_UPDATED_AT = "2026-09-08";
 
 export const BANKS_BY_LOAN = {
   personal: [
+    { name: "IDFC FIRST Bank", rate: 9.99 },
     { name: "HDFC Bank", rate: 9.99 },
     { name: "ICICI Bank", rate: 9.99 },
     { name: "Axis Bank", rate: 9.99 },
+    { name: "Bajaj Finserv", rate: 10.0 },
     { name: "State Bank of India", rate: 10.0 },
-    { name: "Kotak Mahindra Bank", rate: 11.75 },
-    { name: "Bank of Baroda", rate: 12.0 },
-    { name: "Punjab National Bank", rate: 12.25 },
-    { name: "Tata Capital", rate: 13.1 },
-    { name: "Bajaj Finserv", rate: 13.49 },
-    { name: "IDFC FIRST Bank", rate: 11.9 },
+    { name: "Bank of Baroda", rate: 10.15 },
+    { name: "Punjab National Bank", rate: 10.25 },
+    { name: "Tata Capital", rate: 10.99 },
+    { name: "Kotak Mahindra Bank", rate: 10.99 },
   ],
   home: [
     { name: "HDFC Bank", rate: 7.2 },
+    { name: "Bank of Baroda", rate: 7.2 },
     { name: "State Bank of India", rate: 7.25 },
+    { name: "Bajaj Finserv", rate: 7.4 },
+    { name: "Kotak Mahindra Bank", rate: 7.6 },
     { name: "ICICI Bank", rate: 7.65 },
+    { name: "Punjab National Bank", rate: 8.15 },
     { name: "Axis Bank", rate: 8.35 },
-    { name: "Kotak Mahindra Bank", rate: 8.5 },
-    { name: "Bank of Baroda", rate: 8.4 },
-    { name: "Punjab National Bank", rate: 8.45 },
+    { name: "Tata Capital", rate: 8.45 },
     { name: "IDFC FIRST Bank", rate: 8.85 },
   ],
   business: [
     { name: "State Bank of India", rate: 8.5 },
+    { name: "Kotak Mahindra Bank", rate: 10.0 },
     { name: "ICICI Bank", rate: 10.25 },
+    { name: "Punjab National Bank", rate: 10.35 },
     { name: "HDFC Bank", rate: 10.75 },
     { name: "Axis Bank", rate: 11.49 },
-    { name: "Kotak Mahindra Bank", rate: 12.0 },
-    { name: "Bank of Baroda", rate: 11.0 },
-    { name: "Tata Capital", rate: 13.5 },
+    { name: "Tata Capital", rate: 8.45 },
     { name: "Bajaj Finserv", rate: 14.0 },
   ],
   lap: [
+    { name: "Tata Capital", rate: 8.45 },
+    { name: "IDFC FIRST Bank", rate: 8.75 },
     { name: "State Bank of India", rate: 8.95 },
     { name: "HDFC Bank", rate: 9.5 },
     { name: "Axis Bank", rate: 9.5 },
+    { name: "Kotak Mahindra Bank", rate: 9.5 },
     { name: "ICICI Bank", rate: 9.75 },
-    { name: "Kotak Mahindra Bank", rate: 10.0 },
-    { name: "Bank of Baroda", rate: 9.9 },
-    { name: "Tata Capital", rate: 10.5 },
   ],
   education: [
     { name: "State Bank of India", rate: 8.05 },
     { name: "HDFC Bank", rate: 9.5 },
     { name: "ICICI Bank", rate: 9.5 },
     { name: "Axis Bank", rate: 10.5 },
-    { name: "Bank of Baroda", rate: 9.85 },
-    { name: "Punjab National Bank", rate: 9.75 },
   ],
 };
 function bankSetFor(loan) {

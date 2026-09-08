@@ -18,12 +18,90 @@ const SPEED_BY_LOAN_ID = {
 
 const RATE_ROWS = BENCHMARK_LOAN_IDS.map((id) => {
   const loan = LOAN_TYPES.find((l) => l.id === id);
-  const lowest = Math.min(...BANKS_BY_LOAN[id].map((b) => b.rate));
-  return { id, label: loan.title, rate: `${lowest.toFixed(2)}% onwards`, speed: SPEED_BY_LOAN_ID[id] };
+  const banks = [...BANKS_BY_LOAN[id]].sort((a, b) => a.rate - b.rate);
+  return { id, label: loan.title, banks, speed: SPEED_BY_LOAN_ID[id] };
 });
 
 function formatUpdatedDate(iso) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+const prefersReducedMotion =
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Cycles this row through its own bank list, on its own timer — staggered by
+// `offsetMs` so the 5 rows don't all flip in unison.
+function useRotatingBank(banks, offsetMs) {
+  const [index, setIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    if (prefersReducedMotion) return;
+    // Pick a random bank each tick — never the one currently showing, so it
+    // always visibly changes rather than sometimes re-picking the same one.
+    function pickNext() {
+      setIndex((current) => {
+        if (banks.length < 2) return current;
+        let next = Math.floor(Math.random() * banks.length);
+        while (next === current) next = Math.floor(Math.random() * banks.length);
+        return next;
+      });
+    }
+    let interval;
+    const start = setTimeout(() => {
+      pickNext();
+      interval = setInterval(pickNext, 5500);
+    }, 5500 + offsetMs);
+    return () => {
+      clearTimeout(start);
+      clearInterval(interval);
+    };
+  }, [banks, offsetMs]);
+
+  return banks[index];
+}
+
+function RateRow({ row, offsetMs }) {
+  const bank = useRotatingBank(row.banks, offsetMs);
+  const [justUpdated, setJustUpdated] = React.useState(false);
+  const isFirstRender = React.useRef(true);
+
+  React.useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setJustUpdated(true);
+    const timeout = setTimeout(() => setJustUpdated(false), 1000);
+    return () => clearTimeout(timeout);
+  }, [bank.name]);
+
+  return (
+    <Link
+      to={`/loans/${row.id}`}
+      className="flex items-center justify-between p-3 rounded-lg bg-surface hover:bg-teal/5 border border-transparent hover:border-teal/15 transition-[background-color,border-color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group"
+      style={justUpdated ? { backgroundColor: "#1B7F7E14", borderColor: "#1B7F7E30" } : undefined}
+    >
+      <div>
+        <p className="text-sm font-semibold text-ink">{row.label}</p>
+        <p className="text-xs text-ink/55">{row.speed}</p>
+      </div>
+      <span className="flex flex-col items-end">
+        <span
+          key={prefersReducedMotion ? "static" : bank.name}
+          className="flex items-center gap-1 text-sm font-extrabold text-teal group-hover:text-teal-dark rate-pop-in"
+        >
+          {bank.rate.toFixed(2)}% onwards
+          <ArrowUpRight className="w-3.5 h-3.5" />
+        </span>
+        <span
+          key={(prefersReducedMotion ? "static" : bank.name) + "-label"}
+          className="text-[10px] text-ink/40 rate-ticker-in"
+        >
+          {bank.name}
+        </span>
+      </span>
+    </Link>
+  );
 }
 
 const STEPS = [
@@ -72,30 +150,17 @@ export default function Home() {
                 </span>
               </div>
               <div className="flex items-center gap-1.5 mb-4">
-                <span className="relative flex h-1.5 w-1.5">
+                <span className="relative flex h-1.5 w-1.5 shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
                 </span>
                 <p className="text-[11px] text-ink/50">
-                  Lowest starting rate across HDFC, ICICI, Axis &amp; SBI · Updated {formatUpdatedDate(RATE_BENCHMARK_UPDATED_AT)}
+                  Benchmarked against up to 10 lenders per product · Updated {formatUpdatedDate(RATE_BENCHMARK_UPDATED_AT)}
                 </p>
               </div>
               <div className="space-y-2.5">
-                {RATE_ROWS.map((row) => (
-                  <Link
-                    key={row.id}
-                    to={`/loans/${row.id}`}
-                    className="flex items-center justify-between p-3 rounded-lg bg-surface hover:bg-teal/5 border border-transparent hover:border-teal/15 transition-colors group"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-ink">{row.label}</p>
-                      <p className="text-xs text-ink/55">{row.speed}</p>
-                    </div>
-                    <span className="flex items-center gap-1 text-xs font-bold text-teal group-hover:text-teal-dark">
-                      {row.rate}
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </span>
-                  </Link>
+                {RATE_ROWS.map((row, i) => (
+                  <RateRow key={row.id} row={row} offsetMs={i * 650} />
                 ))}
               </div>
               <Link
