@@ -199,7 +199,7 @@ export default function CheckScore() {
                   onChange={(e) => setForm({ ...form, consent: e.target.checked })}
                   className="mt-0.5 w-3.5 h-3.5 accent-teal shrink-0"
                 />
-                I authorize Aaricca Finsales and its bureau partner to run a soft credit inquiry to fetch my score.
+                I authorize Aaricca Finsolve and its bureau partner to run a soft credit inquiry to fetch my score.
                 This is a soft pull and will not impact my credit score in any way.
               </label>
               {error && <p className="text-xs text-warn text-center">{error}</p>}

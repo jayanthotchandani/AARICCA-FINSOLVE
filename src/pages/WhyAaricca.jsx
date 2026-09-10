@@ -37,7 +37,7 @@ export default function WhyAaricca() {
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
       <BackLink />
-      <PageHero title="Why choose Aaricca Finsales" subtitle="Connecting Indian borrowers with institutional capital at fair, transparent, and legally vetted terms." />
+      <PageHero title="Why choose Aaricca Finsolve" subtitle="Connecting Indian borrowers with institutional capital at fair, transparent, and legally vetted terms." />
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
         {PILLARS.map((p, i) => (
