@@ -1,9 +1,28 @@
 import React from "react";
 import { Zap, Percent, ShieldCheck, Headphones, FileText, Landmark } from "lucide-react";
-import { BANK_PARTNERS, TESTIMONIALS } from "../data";
+import { TESTIMONIALS } from "../data";
 import { BackLink, PrimaryButton, PageHero } from "../components/ui";
 import IndiaMap from "../components/IndiaMap";
 import Reveal from "../components/Reveal";
+
+// Logo files live in public/logos/banks — only partners we have an actual
+// logo asset for appear in the marquee (rather than mixing in text-name
+// placeholders for the rest of BANK_PARTNERS, which would look inconsistent
+// next to real logos).
+const PARTNER_LOGOS = [
+  { name: "HDFC Bank", src: "/logos/banks/hdfc-bank.png" },
+  { name: "ICICI Bank", src: "/logos/banks/icici-bank.png" },
+  { name: "State Bank of India", src: "/logos/banks/state-bank-of-india.png" },
+  { name: "Axis Bank", src: "/logos/banks/axis-bank.png" },
+  { name: "Kotak Mahindra Bank", src: "/logos/banks/kotak-mahindra.png" },
+  { name: "Bank of Baroda", src: "/logos/banks/bank-of-baroda.png" },
+  { name: "Punjab National Bank", src: "/logos/banks/punjab-national-bank.png" },
+  { name: "Tata Capital", src: "/logos/banks/tata-capital.jpg" },
+  { name: "Bajaj Finserv", src: "/logos/banks/bajaj-finserv.png" },
+  { name: "Aditya Birla Capital", src: "/logos/banks/aditya-birla-capital.png" },
+  { name: "IDFC FIRST Bank", src: "/logos/banks/idfc-first-bank.png" },
+  { name: "Yes Bank", src: "/logos/banks/yes-bank.png" },
+];
 
 const PILLARS = [
   { icon: Zap, title: "Speed & Express Sanction", desc: "Digital verification pipelines enable pre-approvals in minutes and bank disbursals in 24 hours." },
@@ -46,12 +65,16 @@ export default function WhyAaricca() {
         <div className="text-center mb-6">
           <h2 className="font-display font-bold text-h3 text-teal-dark">Our lending partners</h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {BANK_PARTNERS.map((bank) => (
-            <div key={bank} className="bg-white rounded-lg border border-teal/12 px-4 py-3 text-center text-sm font-semibold text-ink/75">
-              {bank}
-            </div>
-          ))}
+        <div className="relative overflow-hidden bg-white rounded-2xl border border-teal/12 py-10">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent z-10" />
+          <div className="flex w-max animate-ticker">
+            {[...PARTNER_LOGOS, ...PARTNER_LOGOS].map((bank, i) => (
+              <div key={i} className="flex items-center justify-center shrink-0 px-8 sm:px-10" style={{ width: "180px", height: "72px" }}>
+                <img src={bank.src} alt={bank.name} title={bank.name} className="max-h-full max-w-full object-contain" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
