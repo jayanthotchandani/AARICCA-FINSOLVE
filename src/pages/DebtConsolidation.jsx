@@ -1,15 +1,33 @@
 import React, { useState } from "react";
-import { CreditCard, Landmark, ShoppingBag, Plus, X, ArrowLeftRight, ClipboardList, ChevronDown, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CreditCard, Landmark, ShoppingBag, Plus, X, ArrowLeftRight, ClipboardList, ChevronDown, CheckCircle2, Loader2, Sparkles, Gauge } from "lucide-react";
 import { BackLink, PrimaryButton, Field, inputClass, AccordionPanel } from "../components/ui";
+import AutoCarousel from "../components/AutoCarousel";
 import { submitLead } from "../api";
 
 const ICONS = [CreditCard, Landmark, ShoppingBag];
 
+const EMPTY_DEBT = { type: "", principal: "", rate: "", tenure: "", payment: "" };
+
 const INITIAL_DEBTS = [
-  { id: 1, type: "Credit Card", principal: 320000, rate: 38, payment: 18500 },
-  { id: 2, type: "Personal Loan (Other Bank)", principal: 550000, rate: 16.5, payment: 14200 },
-  { id: 3, type: "Store / EMI Card", principal: 110000, rate: 32, payment: 6800 },
+  { id: 1, ...EMPTY_DEBT },
+  { id: 2, ...EMPTY_DEBT },
+  { id: 3, ...EMPTY_DEBT },
 ];
+
+// Standard reducing-balance EMI formula — same one used in the Calculators
+// page — so a row's monthly payment can be estimated the moment amount,
+// rate, and tenure are all in, without waiting for the user to type it.
+function calcEmi(principal, ratePct, tenureYears) {
+  const P = parseFloat(principal);
+  const annualRate = parseFloat(ratePct);
+  const years = parseFloat(tenureYears);
+  if (!(P > 0) || !(annualRate > 0) || !(years > 0)) return "";
+  const r = annualRate / 12 / 100;
+  const n = years * 12;
+  const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  return Math.round(emi);
+}
 
 const HOW_IT_WORKS = [
   { n: 1, title: "Enter every debt you owe", desc: "List each credit card, loan, or EMI card — amount, rate, monthly payment. No limit on how many." },
@@ -30,6 +48,7 @@ const FAQ_ITEMS = [
 
 export default function DebtConsolidation() {
   const [debts, setDebts] = useState(INITIAL_DEBTS);
+  const [cibilScore, setCibilScore] = useState("");
   const [openFaq, setOpenFaq] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [consolidating, setConsolidating] = useState(false);
@@ -41,7 +60,7 @@ export default function DebtConsolidation() {
 
   function addDebt() {
     setReduction(null);
-    setDebts((d) => [...d, { id: Date.now(), type: "", principal: "", rate: "", payment: "" }]);
+    setDebts((d) => [...d, { id: Date.now(), ...EMPTY_DEBT }]);
   }
   function removeDebt(id) {
     setReduction(null);
@@ -49,7 +68,20 @@ export default function DebtConsolidation() {
   }
   function updateDebt(id, key, value) {
     setReduction(null);
-    setDebts((d) => d.map((x) => (x.id === id ? { ...x, [key]: value } : x)));
+    setDebts((d) =>
+      d.map((x) => {
+        if (x.id !== id) return x;
+        const updated = { ...x, [key]: value };
+        // Editing amount, rate, or tenure re-derives the EMI automatically;
+        // editing the EMI field itself is a direct, manual override that
+        // sticks until one of those three inputs changes again.
+        if (key === "principal" || key === "rate" || key === "tenure") {
+          const auto = calcEmi(updated.principal, updated.rate, updated.tenure);
+          if (auto !== "") updated.payment = auto;
+        }
+        return updated;
+      })
+    );
   }
 
   function handleConsolidate() {
@@ -64,10 +96,10 @@ export default function DebtConsolidation() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
+    <div className="max-w-4xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
       <BackLink />
 
-      <div className="max-w-2xl mx-auto text-center mb-10">
+      <div className="max-w-2xl mx-auto text-center mb-6 sm:mb-10">
         <div className="w-14 h-14 rounded-2xl bg-teal/10 text-teal flex items-center justify-center mx-auto mb-4">
           <ArrowLeftRight className="w-6 h-6" strokeWidth={2} />
         </div>
@@ -78,27 +110,41 @@ export default function DebtConsolidation() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
-        {[
-          ["Up to ₹15L", "Amount"],
-          ["9.99% onwards", "Interest Rate"],
-          ["1–7 Years", "Tenure"],
-          ["24–48 Hrs", "Approval Time"],
-        ].map(([v, l]) => (
-          <div key={l} className="bg-white rounded-xl border border-teal/12 px-4 py-3.5 text-center">
-            <p className="font-display font-bold text-sm sm:text-base text-teal-dark">{v}</p>
-            <p className="text-[10px] uppercase tracking-wide text-ink/50 mt-0.5">{l}</p>
-          </div>
-        ))}
-      </div>
-
       <div className="bg-white rounded-2xl border border-teal/12 p-6 sm:p-8 mb-6">
         <h2 className="font-display font-semibold text-lg text-teal-dark">Tell us what you owe</h2>
         <p className="text-xs text-ink/60 mt-1 mb-5">
-          Each row shows the original loan amount, the rate you're paying today, and your current monthly
-          payment — our advisor uses this to spot which ones are overpriced or worth combining. Don't worry
-          about your exact outstanding balance; the amount you originally borrowed is enough.
+          Enter the original loan amount, the rate you're paying today, and the tenure — we'll estimate your
+          monthly EMI automatically. If your real payment is different, just edit that field directly. Don't
+          worry about your exact outstanding balance; the amount you originally borrowed is enough.
         </p>
+
+        <div className="mb-5 p-4 rounded-xl border border-teal/12 bg-surface/50 flex flex-col sm:flex-row sm:items-end gap-3">
+          <div className="flex items-center gap-3 flex-1">
+            <div className="w-9 h-9 rounded-lg bg-teal/10 text-teal flex items-center justify-center shrink-0">
+              <Gauge className="w-4 h-4" strokeWidth={2} />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs font-semibold text-teal-dark mb-1">
+                Your Current CIBIL Score
+              </label>
+              <input
+                type="number"
+                min={300}
+                max={900}
+                value={cibilScore}
+                onChange={(e) => setCibilScore(e.target.value)}
+                placeholder="e.g. 742"
+                className={inputClass}
+              />
+            </div>
+          </div>
+          <Link
+            to="/credit-score/check"
+            className="shrink-0 text-center text-xs font-semibold text-teal hover:text-teal-dark underline underline-offset-2 whitespace-nowrap pb-2.5 sm:pb-2"
+          >
+            Don't know your score? Check it free →
+          </Link>
+        </div>
 
         <div className="space-y-3">
           {debts.map((debt, i) => {
@@ -116,10 +162,11 @@ export default function DebtConsolidation() {
                     className="text-sm font-semibold text-ink bg-transparent outline-none border-b border-transparent focus:border-teal w-full"
                   />
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
                   <MiniField label="Principal Amount" prefix="₹" value={debt.principal} onChange={(v) => updateDebt(debt.id, "principal", v)} />
                   <MiniField label="Rate" suffix="% p.a." value={debt.rate} onChange={(v) => updateDebt(debt.id, "rate", v)} />
-                  <MiniField label="Monthly Payment" prefix="₹" value={debt.payment} onChange={(v) => updateDebt(debt.id, "payment", v)} className="col-span-2 sm:col-span-1" />
+                  <MiniField label="Tenure" suffix="Yrs" value={debt.tenure} onChange={(v) => updateDebt(debt.id, "tenure", v)} />
+                  <MiniField label="Monthly EMI" prefix="₹" value={debt.payment} onChange={(v) => updateDebt(debt.id, "payment", v)} />
                 </div>
                 <button
                   onClick={() => removeDebt(debt.id)}
@@ -185,8 +232,8 @@ export default function DebtConsolidation() {
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4 mb-10">
-        <div className="bg-white rounded-2xl border border-teal/12 p-6">
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible mb-6 sm:mb-10">
+        <div className="shrink-0 w-[80%] snap-center sm:w-auto sm:shrink bg-white rounded-2xl border border-teal/12 p-6">
           <ArrowLeftRight className="w-5 h-5 text-teal mb-2" />
           <h3 className="font-display font-semibold text-ink">Balance Transfer</h3>
           <p className="text-xs text-ink/65 mt-1 leading-relaxed">
@@ -194,7 +241,7 @@ export default function DebtConsolidation() {
             loan to a better lender — same loan, lower rate, nothing else touched.
           </p>
         </div>
-        <div className="bg-white rounded-2xl border border-teal/12 p-6">
+        <div className="shrink-0 w-[80%] snap-center sm:w-auto sm:shrink bg-white rounded-2xl border border-teal/12 p-6">
           <ClipboardList className="w-5 h-5 text-teal mb-2" />
           <h3 className="font-display font-semibold text-ink">Loan Consolidation</h3>
           <p className="text-xs text-ink/65 mt-1 leading-relaxed">
@@ -204,11 +251,12 @@ export default function DebtConsolidation() {
         </div>
       </div>
 
-      <div className="mb-10">
-        <h2 className="font-display font-bold text-h3 text-teal-dark text-center mb-8">How it works</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="mb-6 sm:mb-10">
+        <h2 className="font-display font-bold text-h3 text-teal-dark text-center mb-3 sm:mb-8">How it works</h2>
+        <p className="sm:hidden text-xs font-semibold text-teal-dark/60 text-center mb-4">Swipe for all 4 steps →</p>
+        <AutoCarousel className="flex gap-5 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible">
           {HOW_IT_WORKS.map((s) => (
-            <div key={s.n}>
+            <div key={s.n} className="shrink-0 w-[75%] snap-center sm:w-auto sm:shrink">
               <div className="w-8 h-8 rounded-full bg-teal text-white text-xs font-bold flex items-center justify-center mb-3">
                 {s.n}
               </div>
@@ -216,10 +264,10 @@ export default function DebtConsolidation() {
               <p className="text-xs text-ink/60 mt-1 leading-relaxed">{s.desc}</p>
             </div>
           ))}
-        </div>
+        </AutoCarousel>
       </div>
 
-      <div className="mb-10">
+      <div className="mb-6 sm:mb-10">
         <h2 className="font-display font-bold text-h3 text-teal-dark mb-4">Common questions</h2>
         <div className="space-y-2.5">
           {FAQ_ITEMS.map((item, i) => (
@@ -248,7 +296,7 @@ export default function DebtConsolidation() {
           </div>
         ) : (
           <>
-            <h3 className="font-display font-semibold text-lg text-teal-dark">Get your advisor's recommendation</h3>
+            <h3 className="font-display font-semibold text-lg text-teal-dark">Get our advisor's recommendation</h3>
             <p className="text-xs text-ink/60 mt-1 mb-5">
               Data collection only — no auto-scoring, no automatic plan. An advisor reviews your full debt list personally.
             </p>
@@ -263,10 +311,12 @@ export default function DebtConsolidation() {
                     name: contact.name,
                     phone: contact.phone,
                     details: {
+                      cibilScore: cibilScore || null,
                       debts: debts.map((d) => ({
                         type: d.type,
                         principal: d.principal,
                         rate: d.rate,
+                        tenureYears: d.tenure,
                         monthlyPayment: d.payment,
                       })),
                       estimatedReductionPct: reduction,

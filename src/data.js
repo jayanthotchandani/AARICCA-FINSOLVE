@@ -23,6 +23,22 @@ export const LOAN_TYPES = [
       "10-minute digital in-principle sanction",
       "Zero collateral or guarantor required",
     ],
+    eligibility: [
+      { label: "Age", value: "21–60 years (salaried) · up to 65 years (self-employed)" },
+      { label: "Nationality", value: "Resident Indian citizen" },
+      { label: "Minimum Income", value: "₹25,000/month (salaried) · ₹3 Lakhs annual profit (self-employed)" },
+      { label: "Work Experience", value: "1+ year in current job · 2+ years in business" },
+      { label: "Credit Score", value: "650 and above" },
+    ],
+    documents: {
+      common: ["PAN Card", "Aadhaar Card", "Recent passport-size photograph"],
+      salaried: ["Last 3 months' salary slips", "Last 6 months' bank statement", "Latest Form 16 or ITR"],
+      selfEmployed: [
+        "Last 2 years' ITR with computation",
+        "Last 6 months' bank statement (business + personal)",
+        "Business proof (GST / Udyam / Shop Act registration)",
+      ],
+    },
   },
   {
     id: "business",
@@ -39,6 +55,26 @@ export const LOAN_TYPES = [
       "Collateral-free credit lines available",
       "Overdraft & customized term facilities",
     ],
+    eligibility: [
+      { label: "Age", value: "25–65 years (at loan maturity)" },
+      { label: "Nationality", value: "Resident Indian citizen" },
+      { label: "Minimum Turnover", value: "₹40 Lakhs annual (₹15 Lakhs for professionals)" },
+      { label: "Business Vintage", value: "3+ years in current business · 5 years total experience" },
+      { label: "Credit Score", value: "680 and above" },
+    ],
+    documents: {
+      common: ["PAN Card", "Aadhaar Card / Passport / Voter ID", "Recent passport-size photograph"],
+      business: [
+        "GST registration certificate",
+        "Udyam / Shop Act / business registration",
+        "Proof of business address (utility bill, rent agreement)",
+      ],
+      financial: [
+        "Last 2 years' ITR with computation of income",
+        "Balance Sheet & P&L for last 2 years",
+        "Last 6 months' bank statement (current account)",
+      ],
+    },
   },
   {
     id: "home",
@@ -55,6 +91,27 @@ export const LOAN_TYPES = [
       "Repo-rate linked lowest floating interest",
       "Tax deductions under Sec 80C & 24B",
     ],
+    eligibility: [
+      { label: "Age", value: "21–65 years (salaried) · up to 70 years (self-employed)" },
+      { label: "Nationality", value: "Resident Indian citizen / NRI" },
+      { label: "Minimum Income", value: "₹25,000/month (salaried) · ₹3 Lakhs annual profit (self-employed)" },
+      { label: "Work Experience", value: "2+ years in current job · 3+ years in business" },
+      { label: "Credit Score", value: "700 and above" },
+    ],
+    documents: {
+      common: ["PAN Card, Aadhaar Card", "Recent passport-size photographs", "Address proof"],
+      salaried: ["Last 3 months' salary slips", "Form 16 / last 2 years' ITR", "Last 6 months' bank statement"],
+      selfEmployed: [
+        "Last 3 years' ITR with computation",
+        "Balance Sheet & P&L for last 2 years",
+        "Last 6 months' bank statement (business + personal)",
+      ],
+      property: [
+        "Sale agreement / allotment letter",
+        "Approved building plan",
+        "NOC from builder/society & title documents",
+      ],
+    },
   },
   {
     id: "lap",
@@ -71,6 +128,26 @@ export const LOAN_TYPES = [
       "High LTV: up to 70% of property market value",
       "Longer tenures keep monthly EMIs low",
     ],
+    eligibility: [
+      { label: "Age", value: "21–65 years (salaried) · 25–70 years (self-employed)" },
+      { label: "Nationality", value: "Resident Indian citizen" },
+      { label: "Minimum Income", value: "₹30,000/month (salaried) · ₹4 Lakhs annual profit (self-employed)" },
+      { label: "Work Experience", value: "2+ years in current job · 3+ years in business" },
+      { label: "Credit Score", value: "675 and above" },
+    ],
+    documents: {
+      common: ["PAN Card, Aadhaar Card", "Recent passport-size photographs"],
+      income: [
+        "Salary slips / Form 16 (salaried) or ITR + P&L (self-employed)",
+        "Last 6 months' bank statements",
+      ],
+      property: [
+        "Sale deed / title deed",
+        "Encumbrance certificate (13–30 years)",
+        "Property tax receipts",
+        "Approved floor plan & occupancy certificate",
+      ],
+    },
   },
   {
     id: "education",
@@ -87,6 +164,26 @@ export const LOAN_TYPES = [
       "100% tuition, travel & living expense coverage",
       "Moratorium period — repay after course completion",
     ],
+    eligibility: [
+      { label: "Age", value: "16–35 years (student applicant)" },
+      { label: "Nationality", value: "Resident Indian citizen" },
+      { label: "Admission Status", value: "Confirmed admission in recognized institute/course" },
+      { label: "Co-Applicant", value: "Mandatory — parent, guardian, or spouse" },
+      { label: "Credit Score", value: "650 and above (co-applicant)" },
+    ],
+    documents: {
+      common: ["PAN & Aadhaar of student and co-applicant", "Passport-size photographs (both)"],
+      academic: [
+        "Admission letter / offer letter",
+        "Mark sheets — 10th, 12th, graduation (if applicable)",
+        "Entrance exam scorecard (if any)",
+      ],
+      coApplicantIncome: ["Last 3 months' salary slips or 2 years' ITR", "Last 6 months' bank statement"],
+      collateral: [
+        "Property/FD documents pledged as security (loans above ₹45 Lakhs)",
+        "Valuation report of collateral",
+      ],
+    },
   },
   {
     id: "msme",
@@ -103,6 +200,23 @@ export const LOAN_TYPES = [
       "Government CGTMSE-backed credit options",
       "Machinery financing up to 85% of invoice value",
     ],
+    eligibility: [
+      { label: "Age", value: "21–65 years (at loan maturity)" },
+      { label: "Nationality", value: "Resident Indian citizen" },
+      { label: "Minimum Turnover", value: "₹10 Lakhs annual (Udyam Micro category)" },
+      { label: "Business Vintage", value: "3+ years in current business" },
+      { label: "Credit Score", value: "660 and above" },
+    ],
+    documents: {
+      common: ["PAN & Aadhaar of proprietor/directors", "Recent passport-size photographs"],
+      registration: ["Udyam Registration Certificate", "GST registration certificate", "Shop Act / trade license"],
+      financial: [
+        "Last 2 years' ITR with P&L and balance sheet",
+        "Last 6–12 months' bank statements",
+        "GST returns (last 12 months)",
+      ],
+      machinery: ["Performa invoice / quotation from machinery vendor", "Machinery specification sheet"],
+    },
   },
 ];
 

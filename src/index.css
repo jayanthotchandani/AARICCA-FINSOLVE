@@ -111,6 +111,24 @@ input[type="range"]::-webkit-slider-runnable-track {
   font-variant-numeric: tabular-nums;
 }
 
+/* Horizontal swipe carousels (mobile card sections) — the scroll-snap track
+   itself needs no visible scrollbar; the swipe motion is the only affordance.
+   overflow-anchor is disabled because scroll anchoring and horizontal
+   scroll-snap fight each other: as this track enters the viewport during an
+   ordinary vertical page scroll, the browser can misattribute the anchor to
+   a snap point inside it and yank the page's scroll position for one frame.
+   overscroll-behavior-x keeps a fast horizontal swipe from chaining into a
+   browser back/forward navigation gesture once the track hits its edge. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-anchor: none;
+  overscroll-behavior-x: contain;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes ticker {
   0% {
     transform: translateX(0);

@@ -6,6 +6,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { insertLead, listLeads, deleteLead } from "./db.js";
 import { checkCredentials, issueSession, clearSession, requireAuth, isAuthed } from "./auth.js";
+import { requestOtp, resendOtp, verifyOtp } from "./creditScore.js";
+import { listRatesByLoan, addRate, updateRate, deleteRate } from "./rates.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, "..", "dist");
@@ -42,6 +44,42 @@ app.post("/api/leads", (req, res) => {
   const lead = insertLead({ source, name, phone, email, loanType, amount, details });
   broadcastNewLead(lead);
   res.status(201).json({ ok: true, id: lead.id });
+});
+
+// --- Public: bank rates powering the homepage ticker and every loan
+// product page's bank selector. Editable from the internal admin tool
+// (see the protected /api/rates routes below) so rates can be updated
+// without a code change or redeploy. ---
+app.get("/api/rates", (req, res) => {
+  res.json(listRatesByLoan());
+});
+
+// --- Credit score: soft-pull OTP flow (mocked until ROOPYA API is connected) ---
+app.post("/api/credit-score/request-otp", (req, res) => {
+  try {
+    const { requestId, maskedPhone } = requestOtp(req.body || {});
+    res.json({ ok: true, requestId, maskedPhone });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post("/api/credit-score/resend-otp", (req, res) => {
+  try {
+    const { requestId, maskedPhone } = resendOtp((req.body || {}).requestId);
+    res.json({ ok: true, requestId, maskedPhone });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post("/api/credit-score/verify-otp", (req, res) => {
+  try {
+    const result = verifyOtp(req.body || {});
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // --- Auth ---
@@ -84,6 +122,38 @@ app.get("/api/leads/stream", requireAuth, (req, res) => {
 app.delete("/api/leads/:id", requireAuth, (req, res) => {
   const ok = deleteLead(Number(req.params.id));
   if (!ok) return res.status(404).json({ error: "Lead not found" });
+  res.json({ ok: true });
+});
+
+app.post("/api/rates", requireAuth, (req, res) => {
+  const { loanId, bankName, rate } = req.body || {};
+  if (!loanId || !bankName || typeof rate !== "number" || rate <= 0) {
+    return res.status(400).json({ error: "loanId, bankName, and a positive rate are required" });
+  }
+  try {
+    const row = addRate({ loanId, bankName, rate });
+    res.status(201).json(row);
+  } catch (err) {
+    if (String(err.message).includes("UNIQUE")) {
+      return res.status(409).json({ error: `${bankName} already has a rate for this loan type` });
+    }
+    res.status(500).json({ error: "Could not add bank rate" });
+  }
+});
+
+app.put("/api/rates/:id", requireAuth, (req, res) => {
+  const { rate } = req.body || {};
+  if (typeof rate !== "number" || rate <= 0) {
+    return res.status(400).json({ error: "A positive rate is required" });
+  }
+  const row = updateRate(Number(req.params.id), rate);
+  if (!row) return res.status(404).json({ error: "Rate not found" });
+  res.json(row);
+});
+
+app.delete("/api/rates/:id", requireAuth, (req, res) => {
+  const ok = deleteRate(Number(req.params.id));
+  if (!ok) return res.status(404).json({ error: "Rate not found" });
   res.json({ ok: true });
 });
 

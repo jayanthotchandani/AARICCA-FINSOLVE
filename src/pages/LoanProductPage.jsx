@@ -1,20 +1,42 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
-import { ChevronDown, Check, CheckCircle2, Loader2 } from "lucide-react";
+import { ChevronDown, Check, CheckCircle2, Loader2, FileText } from "lucide-react";
 import { LOAN_TYPES, BANKS_BY_LOAN } from "../data";
 import { BackLink, PrimaryButton, Field, inputClass } from "../components/ui";
-import { submitLead } from "../api";
+import { submitLead, getRates } from "../api";
 
 function formatINR(n) {
   return "₹" + Math.round(n).toLocaleString("en-IN");
 }
+
+// Different loan types group their required documents differently (a home
+// loan needs property papers, an education loan needs a co-applicant's
+// income proof, etc.) — this maps each possible group key in data.js to its
+// display title, so the page can render whatever groups a given loan defines
+// without hardcoding a fixed set of sections.
+const DOC_GROUP_TITLES = {
+  common: "For everyone",
+  salaried: "If you're salaried",
+  selfEmployed: "If you're self-employed",
+  business: "Business proof",
+  financial: "Financial documents",
+  property: "Property documents",
+  income: "Income proof",
+  academic: "Academic documents",
+  coApplicantIncome: "Co-applicant income proof",
+  collateral: "Collateral documents",
+  registration: "Business registration",
+  machinery: "Machinery / quotation proof",
+};
 
 export default function LoanProductPage() {
   const { loanId } = useParams();
   const loan = LOAN_TYPES.find((l) => l.id === loanId);
   if (!loan) return <Navigate to="/" replace />;
 
-  const banks = BANKS_BY_LOAN[loan.id];
+  // Static data.js is the instant-paint fallback; the live fetch then swaps
+  // in whatever the internal admin tool's Bank Rates tab currently has.
+  const [banks, setBanks] = useState(BANKS_BY_LOAN[loan.id] || []);
   const [bankIdx, setBankIdx] = useState(0);
   const bank = banks[bankIdx];
 
@@ -26,6 +48,26 @@ export default function LoanProductPage() {
   useEffect(() => {
     setRate(bank.rate);
   }, [bankIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    getRates()
+      .then((byLoan) => {
+        const rows = byLoan[loan.id];
+        if (rows && rows.length) {
+          const mapped = rows.map((r) => ({ name: r.bank_name, rate: r.rate }));
+          setBanks(mapped);
+          setBankIdx(0);
+          // Set directly rather than relying on the bankIdx-driven effect
+          // above — if bankIdx is already 0, that effect's dependency
+          // wouldn't change, leaving the EMI calculator on the stale
+          // static-fallback rate even though the bank list just updated.
+          setRate(mapped[0].rate);
+        }
+      })
+      .catch(() => {
+        // Static fallback already rendering.
+      });
+  }, [loan.id]);
 
   const emi = useMemo(() => {
     const P = amount;
@@ -128,6 +170,45 @@ export default function LoanProductPage() {
           </div>
         </div>
       </div>
+
+      {/* Eligibility criteria + documents required */}
+      {(loan.eligibility || loan.documents) && (
+        <div className="bg-white rounded-2xl border border-teal/12 p-6 sm:p-8 shadow-card mb-8">
+          <h2 className="font-display font-semibold text-lg text-teal-dark">Eligibility &amp; documents required</h2>
+          <p className="text-xs text-ink/60 mt-1 mb-1 sm:mb-5">
+            Check upfront so your advisor call moves faster — nothing here auto-approves or auto-rejects you.
+          </p>
+          <p className="sm:hidden text-xs font-semibold text-teal-dark/60 mb-4">Swipe for eligibility &amp; documents →</p>
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible">
+            {loan.eligibility && (
+              <div className="shrink-0 w-[85%] snap-center sm:w-auto sm:shrink rounded-xl border border-teal/10 bg-surface/40 p-4 sm:border-0 sm:bg-transparent sm:p-0">
+                <h3 className="text-xs font-bold text-teal-dark uppercase tracking-wide mb-3">Eligibility criteria</h3>
+                <ul className="space-y-2.5">
+                  {loan.eligibility.map((item) => (
+                    <li key={item.label} className="flex gap-2.5 text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-teal shrink-0 mt-0.5" />
+                      <span>
+                        <span className="font-semibold text-ink">{item.label}:</span>{" "}
+                        <span className="text-ink/70">{item.value}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {loan.documents && (
+              <div className="shrink-0 w-[85%] snap-center sm:w-auto sm:shrink rounded-xl border border-teal/10 bg-surface/40 p-4 sm:border-0 sm:bg-transparent sm:p-0">
+                <h3 className="text-xs font-bold text-teal-dark uppercase tracking-wide mb-3">Documents you&apos;ll need</h3>
+                <div className="space-y-4">
+                  {Object.entries(loan.documents).map(([key, items]) => (
+                    <DocGroup key={key} title={DOC_GROUP_TITLES[key] || key} items={items} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Eligibility form */}
       <div className="bg-white rounded-2xl border-2 border-teal/15 p-6 sm:p-8">
@@ -256,6 +337,22 @@ export default function LoanProductPage() {
         Looking for something else? <Link to="/calculators" className="text-teal hover:underline">Try the general calculator</Link> or{" "}
         <Link to="/debt-consolidation" className="text-teal hover:underline">consolidate existing debt</Link>.
       </p>
+    </div>
+  );
+}
+
+function DocGroup({ title, items }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-ink/70 mb-1.5">{title}</p>
+      <ul className="space-y-1.5">
+        {items.map((doc) => (
+          <li key={doc} className="flex gap-2 text-sm text-ink/70">
+            <FileText className="w-3.5 h-3.5 text-gold-dark shrink-0 mt-0.5" />
+            {doc}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -8,3 +8,5 @@ dist-ssr
 server/leads.db
 server/leads.db-*
 .serena/
+.dev-server.log
+.dev-server.err.log

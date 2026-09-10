@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail, Trash2 } from "lucide-react";
+import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail, Trash2, Plus, Pencil, X, Check } from "lucide-react";
 import { inputClass, Field, PrimaryButton } from "../components/ui";
+import { LOAN_TYPES } from "../data";
+import { getRates, addBankRate, updateBankRate, deleteBankRate } from "../api";
 
 const SOURCE_LABELS = {
   apply: "Loan Application",
@@ -126,6 +128,7 @@ function LoginGate({ onLoggedIn }) {
 }
 
 function Dashboard({ onLoggedOut }) {
+  const [tab, setTab] = useState("leads");
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [justArrivedId, setJustArrivedId] = useState(null);
@@ -177,12 +180,16 @@ function Dashboard({ onLoggedOut }) {
         <div className="flex items-start sm:items-center justify-between mb-6 gap-4 flex-col sm:flex-row">
           <div>
             <p className="text-[11px] font-semibold text-ink/45 uppercase tracking-wide">Internal Tool · /internal-leads-portal</p>
-            <h1 className="font-display font-bold text-2xl text-teal-dark">Call Center Lead Queue</h1>
+            <h1 className="font-display font-bold text-2xl text-teal-dark">
+              {tab === "leads" ? "Call Center Lead Queue" : "Bank Rates"}
+            </h1>
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success/10 text-success">
-              <Radio className="w-3 h-3" /> Live
-            </span>
+            {tab === "leads" && (
+              <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success/10 text-success">
+                <Radio className="w-3 h-3" /> Live
+              </span>
+            )}
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-ink/5 text-ink/60 hover:bg-ink/10 transition-colors"
@@ -192,39 +199,290 @@ function Dashboard({ onLoggedOut }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="flex gap-2 mb-6 border-b border-teal/12">
           {[
-            [leads.length, "Total Leads"],
-            [leadsToday, "Leads Today"],
-            [bySource.apply || 0, "Loan Applications"],
-            [(bySource.debt_consolidation || 0) + (bySource.check_score || 0), "Score Checks + Debt"],
-          ].map(([v, l]) => (
-            <div key={l} className="bg-white rounded-xl border border-teal/12 p-4 text-center">
-              <p className="font-display font-bold text-2xl text-teal-dark">{v}</p>
-              <p className="text-[11px] text-ink/50 mt-0.5">{l}</p>
-            </div>
+            ["leads", "Lead Queue"],
+            ["rates", "Bank Rates"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+                tab === key ? "border-teal text-teal-dark" : "border-transparent text-ink/50 hover:text-ink"
+              }`}
+            >
+              {label}
+            </button>
           ))}
         </div>
 
-        <ExportBar />
+        {tab === "leads" ? (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              {[
+                [leads.length, "Total Leads"],
+                [leadsToday, "Leads Today"],
+                [bySource.apply || 0, "Loan Applications"],
+                [(bySource.debt_consolidation || 0) + (bySource.check_score || 0), "Score Checks + Debt"],
+              ].map(([v, l]) => (
+                <div key={l} className="bg-white rounded-xl border border-teal/12 p-4 text-center">
+                  <p className="font-display font-bold text-2xl text-teal-dark">{v}</p>
+                  <p className="text-[11px] text-ink/50 mt-0.5">{l}</p>
+                </div>
+              ))}
+            </div>
 
-        <h2 className="font-display font-semibold text-ink mb-3">Live Feed — All Leads</h2>
-        {loading ? (
-          <div className="flex items-center justify-center py-16 text-ink/40">
-            <Loader2 className="w-5 h-5 animate-spin" />
-          </div>
-        ) : leads.length === 0 ? (
-          <div className="bg-white rounded-xl border border-teal/12 p-10 text-center text-sm text-ink/50">
-            No leads yet. Submissions from the site's forms will appear here the moment they come in.
-          </div>
+            <ExportBar />
+
+            <h2 className="font-display font-semibold text-ink mb-3">Live Feed — All Leads</h2>
+            {loading ? (
+              <div className="flex items-center justify-center py-16 text-ink/40">
+                <Loader2 className="w-5 h-5 animate-spin" />
+              </div>
+            ) : leads.length === 0 ? (
+              <div className="bg-white rounded-xl border border-teal/12 p-10 text-center text-sm text-ink/50">
+                No leads yet. Submissions from the site's forms will appear here the moment they come in.
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {leads.map((lead) => (
+                  <LeadCard key={lead.id} lead={lead} justArrived={lead.id === justArrivedId} onDelete={handleDelete} />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {leads.map((lead) => (
-              <LeadCard key={lead.id} lead={lead} justArrived={lead.id === justArrivedId} onDelete={handleDelete} />
-            ))}
-          </div>
+          <RatesTab />
         )}
       </div>
+    </div>
+  );
+}
+
+function RatesTab() {
+  const [ratesByLoan, setRatesByLoan] = useState(null);
+  const [error, setError] = useState("");
+
+  const load = useCallback(() => {
+    getRates()
+      .then(setRatesByLoan)
+      .catch((err) => setError(err.message));
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  if (error) {
+    return <p className="text-sm text-warn">{error}</p>;
+  }
+  if (!ratesByLoan) {
+    return (
+      <div className="flex items-center justify-center py-16 text-ink/40">
+        <Loader2 className="w-5 h-5 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-xs text-ink/55 mb-5 max-w-2xl">
+        Rates entered here go live on the homepage rate ticker and every loan product page immediately —
+        no developer or redeploy needed.
+      </p>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {LOAN_TYPES.map((loan) => (
+          <LoanRatesCard
+            key={loan.id}
+            loan={loan}
+            rows={ratesByLoan[loan.id] || []}
+            onChange={(rows) => setRatesByLoan((prev) => ({ ...prev, [loan.id]: rows }))}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LoanRatesCard({ loan, rows, onChange }) {
+  const [adding, setAdding] = useState(false);
+  const [newBank, setNewBank] = useState("");
+  const [newRate, setNewRate] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const sorted = [...rows].sort((a, b) => a.rate - b.rate);
+
+  async function handleAdd(e) {
+    e.preventDefault();
+    setError("");
+    const rate = parseFloat(newRate);
+    if (!newBank.trim() || !(rate > 0)) {
+      setError("Enter a bank name and a positive rate.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const row = await addBankRate({ loanId: loan.id, bankName: newBank.trim(), rate });
+      onChange([...rows, row]);
+      setNewBank("");
+      setNewRate("");
+      setAdding(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleUpdate(id, rate) {
+    const row = await updateBankRate(id, rate);
+    onChange(rows.map((r) => (r.id === id ? row : r)));
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Remove this bank from the list?")) return;
+    await deleteBankRate(id);
+    onChange(rows.filter((r) => r.id !== id));
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-teal/12 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-display font-semibold text-sm text-teal-dark">{loan.title}</h3>
+        <span className="text-[10px] text-ink/45">{rows.length} banks</span>
+      </div>
+      <div className="space-y-1.5">
+        {sorted.map((row) => (
+          <RateRowEditable key={row.id} row={row} onUpdate={handleUpdate} onDelete={handleDelete} />
+        ))}
+        {rows.length === 0 && <p className="text-xs text-ink/45 py-2">No banks listed yet.</p>}
+      </div>
+
+      {adding ? (
+        <form onSubmit={handleAdd} className="mt-3 pt-3 border-t border-teal/10 flex items-end gap-2">
+          <div className="flex-1">
+            <label className="block text-[10px] text-ink/50 mb-1">Bank name</label>
+            <input
+              autoFocus
+              value={newBank}
+              onChange={(e) => setNewBank(e.target.value)}
+              placeholder="e.g. Federal Bank"
+              className="w-full px-2.5 py-1.5 rounded-lg border border-teal/20 text-xs outline-none focus:border-teal"
+            />
+          </div>
+          <div className="w-20">
+            <label className="block text-[10px] text-ink/50 mb-1">Rate %</label>
+            <input
+              type="number"
+              step="0.01"
+              value={newRate}
+              onChange={(e) => setNewRate(e.target.value)}
+              placeholder="9.99"
+              className="w-full px-2.5 py-1.5 rounded-lg border border-teal/20 text-xs outline-none focus:border-teal"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={submitting}
+            aria-label="Add bank"
+            className="p-2 rounded-lg bg-teal text-white hover:bg-teal-dark transition-colors disabled:opacity-60"
+          >
+            {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setAdding(false);
+              setError("");
+            }}
+            aria-label="Cancel"
+            className="p-2 rounded-lg bg-ink/5 text-ink/50 hover:bg-ink/10 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </form>
+      ) : (
+        <button
+          onClick={() => setAdding(true)}
+          className="mt-3 pt-3 border-t border-teal/10 w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-teal hover:text-teal-dark transition-colors"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Bank
+        </button>
+      )}
+      {error && <p className="text-[11px] text-warn mt-2">{error}</p>}
+    </div>
+  );
+}
+
+function RateRowEditable({ row, onUpdate, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(String(row.rate));
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    const rate = parseFloat(value);
+    if (!(rate > 0)) {
+      setValue(String(row.rate));
+      setEditing(false);
+      return;
+    }
+    if (rate === row.rate) {
+      setEditing(false);
+      return;
+    }
+    setSaving(true);
+    try {
+      await onUpdate(row.id, rate);
+    } finally {
+      setSaving(false);
+      setEditing(false);
+    }
+  }
+
+  return (
+    <div className="group flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface/70 transition-colors">
+      <span className="text-xs text-ink/80 truncate">{row.bank_name}</span>
+      {editing ? (
+        <div className="flex items-center gap-1 shrink-0">
+          <input
+            autoFocus
+            type="number"
+            step="0.01"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") save();
+              if (e.key === "Escape") {
+                setValue(String(row.rate));
+                setEditing(false);
+              }
+            }}
+            className="w-16 px-1.5 py-0.5 rounded border border-teal/30 text-xs text-end outline-none focus:border-teal"
+          />
+          <button onClick={save} disabled={saving} aria-label="Save rate" className="p-1 text-teal hover:text-teal-dark">
+            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-xs font-bold text-teal tabular-nums">{row.rate}%</span>
+          <button
+            onClick={() => setEditing(true)}
+            aria-label="Edit rate"
+            className="p-1 text-ink/30 opacity-0 group-hover:opacity-100 hover:text-teal transition-[opacity,color]"
+          >
+            <Pencil className="w-3 h-3" />
+          </button>
+          <button
+            onClick={() => onDelete(row.id)}
+            aria-label="Remove bank"
+            className="p-1 text-ink/30 opacity-0 group-hover:opacity-100 hover:text-warn transition-[opacity,color]"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,7 +4,10 @@ import { ShieldCheck } from "lucide-react";
 import { SCORE_TIERS } from "../data";
 import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass } from "../components/ui";
 import ScoreGauge, { tierForScore } from "../components/ScoreGauge";
-import { submitLead } from "../api";
+import OtpModal from "../components/OtpModal";
+import { submitLead, requestCreditScoreOtp, resendCreditScoreOtp, verifyCreditScoreOtp } from "../api";
+
+const PAN_RE = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 
 const TIER_STYLES = {
   excellent: { bg: "#EAF6F5", border: "#1B7F7E33", text: "#155F5E" },
@@ -14,31 +17,76 @@ const TIER_STYLES = {
 };
 
 export default function CheckScore() {
-  const [form, setForm] = useState({ name: "", phone: "", email: "", income: "80000", employment: "salaried" });
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    pan: "",
+    dob: "",
+    income: "80000",
+    employment: "salaried",
+    consent: false,
+  });
   const phoneValid = /^\d{10}$/.test(form.phone);
+  const panValid = PAN_RE.test(form.pan);
+  const canSubmit = phoneValid && panValid && form.dob && form.consent;
+
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [otpState, setOtpState] = useState(null); // { requestId, maskedPhone }
+  const [otpError, setOtpError] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
+      const { requestId, maskedPhone } = await requestCreditScoreOtp({
+        name: form.name,
+        pan: form.pan.toUpperCase(),
+        dob: form.dob,
+        phone: form.phone,
+        email: form.email,
+      });
+      setOtpState({ requestId, maskedPhone });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyOtp(code) {
+    setOtpError("");
+    setOtpLoading(true);
+    try {
+      const { score } = await verifyCreditScoreOtp({ requestId: otpState.requestId, otp: code });
       await submitLead({
         source: "check_score",
         name: form.name,
         phone: form.phone,
         email: form.email,
-        details: { monthlyIncome: form.income, employment: form.employment },
+        details: { pan: form.pan.toUpperCase(), dob: form.dob, monthlyIncome: form.income, employment: form.employment },
       });
-      const inc = parseInt(form.income, 10) || 50000;
-      const score = inc > 100000 ? 795 : inc > 60000 ? 742 : 668;
       setResult(score);
+      setOtpState(null);
     } catch (err) {
-      setError(err.message);
+      setOtpError(err.message);
     } finally {
-      setLoading(false);
+      setOtpLoading(false);
+    }
+  }
+
+  async function handleResendOtp() {
+    try {
+      const { requestId, maskedPhone } = await resendCreditScoreOtp(otpState.requestId);
+      setOtpState({ requestId, maskedPhone });
+      setOtpError("");
+    } catch (err) {
+      setOtpError(err.message);
     }
   }
 
@@ -87,6 +135,30 @@ export default function CheckScore() {
                   )}
                 </Field>
               </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="PAN Number" required hint="Required by the bureau to match your credit file.">
+                  <input
+                    required
+                    value={form.pan}
+                    onChange={(e) => setForm({ ...form, pan: e.target.value.toUpperCase().slice(0, 10) })}
+                    placeholder="ABCDE1234F"
+                    className={`${inputClass} uppercase tracking-wide`}
+                  />
+                  {form.pan.length > 0 && !panValid && (
+                    <p className="text-[11px] text-warn mt-1">Enter a valid PAN (e.g. ABCDE1234F).</p>
+                  )}
+                </Field>
+                <Field label="Date of Birth" required>
+                  <input
+                    required
+                    type="date"
+                    value={form.dob}
+                    max={new Date().toISOString().slice(0, 10)}
+                    onChange={(e) => setForm({ ...form, dob: e.target.value })}
+                    className={inputClass}
+                  />
+                </Field>
+              </div>
               <div className="grid sm:grid-cols-3 gap-4">
                 <Field label="Email ID" required>
                   <input
@@ -120,9 +192,19 @@ export default function CheckScore() {
                   />
                 </Field>
               </div>
+              <label className="flex items-start gap-2.5 text-[11px] text-ink/60 leading-relaxed">
+                <input
+                  type="checkbox"
+                  checked={form.consent}
+                  onChange={(e) => setForm({ ...form, consent: e.target.checked })}
+                  className="mt-0.5 w-3.5 h-3.5 accent-teal shrink-0"
+                />
+                I authorize Aaricca Finsales and its bureau partner to run a soft credit inquiry to fetch my score.
+                This is a soft pull and will not impact my credit score in any way.
+              </label>
               {error && <p className="text-xs text-warn text-center">{error}</p>}
-              <PrimaryButton type="submit" full disabled={loading || !phoneValid}>
-                {loading ? "Generating your report…" : "Unlock My Free Credit Report & Bank Pre-Approvals"}
+              <PrimaryButton type="submit" full disabled={loading || !canSubmit}>
+                {loading ? "Sending verification code…" : "Unlock My Free Credit Report & Bank Pre-Approvals"}
               </PrimaryButton>
               <p className="flex items-center gap-1.5 text-[11px] text-ink/50 justify-center">
                 <ShieldCheck className="w-3.5 h-3.5 text-teal" /> 256-bit secure · soft inquiry only
@@ -180,6 +262,20 @@ export default function CheckScore() {
           })}
         </div>
       </div>
+
+      {otpState && (
+        <OtpModal
+          phone={otpState.maskedPhone}
+          error={otpError}
+          loading={otpLoading}
+          onVerify={handleVerifyOtp}
+          onResend={handleResendOtp}
+          onClose={() => {
+            setOtpState(null);
+            setOtpError("");
+          }}
+        />
+      )}
     </div>
   );
 }

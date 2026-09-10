@@ -6,6 +6,7 @@ import { PrimaryButton, SecondaryButton, StatBlock, ArrowCTA, Field, inputClass 
 import ScoreGauge, { tierForScore } from "../components/ScoreGauge";
 import ProcessPath from "../components/ProcessPath";
 import Reveal from "../components/Reveal";
+import { getRates } from "../api";
 
 const BENCHMARK_LOAN_IDS = ["personal", "home", "business", "lap", "education"];
 const SPEED_BY_LOAN_ID = {
@@ -16,11 +17,13 @@ const SPEED_BY_LOAN_ID = {
   education: "3–5 Working Days",
 };
 
-const RATE_ROWS = BENCHMARK_LOAN_IDS.map((id) => {
-  const loan = LOAN_TYPES.find((l) => l.id === id);
-  const banks = [...BANKS_BY_LOAN[id]].sort((a, b) => a.rate - b.rate);
-  return { id, label: loan.title, banks, speed: SPEED_BY_LOAN_ID[id] };
-});
+function buildRateRows(banksByLoan) {
+  return BENCHMARK_LOAN_IDS.map((id) => {
+    const loan = LOAN_TYPES.find((l) => l.id === id);
+    const banks = [...(banksByLoan[id] || [])].sort((a, b) => a.rate - b.rate);
+    return { id, label: loan.title, banks, speed: SPEED_BY_LOAN_ID[id] };
+  });
+}
 
 function formatUpdatedDate(iso) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -115,10 +118,38 @@ export default function Home() {
   const [score, setScore] = React.useState(742);
   const tier = tierForScore(score);
 
+  // Static data.js is the instant-paint fallback (no flash of empty
+  // content); the live fetch then swaps in whatever the internal admin
+  // tool's Bank Rates tab currently has, without a page reload.
+  const [banksByLoan, setBanksByLoan] = React.useState(BANKS_BY_LOAN);
+  const [updatedAt, setUpdatedAt] = React.useState(RATE_BENCHMARK_UPDATED_AT);
+
+  React.useEffect(() => {
+    getRates()
+      .then((byLoan) => {
+        const normalized = {};
+        let latest = null;
+        for (const [loanId, rows] of Object.entries(byLoan)) {
+          normalized[loanId] = rows.map((r) => ({ name: r.bank_name, rate: r.rate }));
+          for (const r of rows) {
+            if (!latest || r.updated_at > latest) latest = r.updated_at;
+          }
+        }
+        setBanksByLoan(normalized);
+        if (latest) setUpdatedAt(latest);
+      })
+      .catch(() => {
+        // Static fallback already rendering — a failed live fetch just
+        // means the ticker stays on last-known rates instead of erroring.
+      });
+  }, []);
+
+  const rateRows = React.useMemo(() => buildRateRows(banksByLoan), [banksByLoan]);
+
   return (
     <div>
       {/* Hero */}
-      <section className="pt-14 pb-16 sm:pt-20 sm:pb-20">
+      <section className="pt-8 pb-16 sm:pt-20 sm:pb-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 rise-in">
             <h1 className="font-display font-bold text-h1-sm sm:text-h1 text-ink leading-[1.08] text-balance">
@@ -155,11 +186,11 @@ export default function Home() {
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
                 </span>
                 <p className="text-[11px] text-ink/50">
-                  Benchmarked against up to 10 lenders per product · Updated {formatUpdatedDate(RATE_BENCHMARK_UPDATED_AT)}
+                  Benchmarked against up to 10 lenders per product · Updated {formatUpdatedDate(updatedAt)}
                 </p>
               </div>
               <div className="space-y-2.5">
-                {RATE_ROWS.map((row, i) => (
+                {rateRows.map((row, i) => (
                   <RateRow key={row.id} row={row} offsetMs={i * 650} />
                 ))}
               </div>
@@ -176,17 +207,17 @@ export default function Home() {
       </section>
 
       {/* Credit score gauge */}
-      <section className="py-16 bg-white border-y border-teal/10">
+      <section className="py-8 sm:py-16 bg-white border-y border-teal/10">
         <div className="max-w-4xl mx-auto px-5 sm:px-8">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
+          <div className="grid md:grid-cols-2 gap-3 md:gap-10 items-center">
             <div>
-              <h2 className="font-display font-bold text-h3 text-teal-dark">Where does your credit score stand?</h2>
-              <p className="mt-3 text-sm text-ink/70 leading-relaxed">
+              <h2 className="font-display font-bold text-lg sm:text-h3 text-teal-dark">Where does your credit score stand?</h2>
+              <p className="mt-1.5 sm:mt-3 text-xs sm:text-sm text-ink/70 leading-relaxed">
                 Drag the slider to your rough score and see, live, what tier that lands you in — before
                 you check your real score. No sign-up, no impact to your bureau file.
               </p>
 
-              <div className="mt-5">
+              <div className="mt-2.5 sm:mt-5">
                 <div className="flex justify-between items-baseline mb-1.5">
                   <span className="text-xs font-bold text-teal-dark">Your approximate score</span>
                   <span className="text-sm font-bold text-ink tabular-nums bg-surface px-2.5 py-0.5 rounded border border-teal/15">
@@ -210,25 +241,27 @@ export default function Home() {
               </div>
 
               <div
-                className="mt-5 p-4 rounded-xl border transition-colors duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                className="mt-2.5 sm:mt-5 p-2.5 sm:p-4 rounded-xl border transition-colors duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
                 style={{ backgroundColor: tier.bg, borderColor: tier.color + "33" }}
               >
-                <p className="text-sm font-bold transition-colors duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" style={{ color: tier.color }}>
+                <p className="text-xs sm:text-sm font-bold transition-colors duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]" style={{ color: tier.color }}>
                   {tier.label.toUpperCase()} — {tier.note}
                 </p>
-                <p className="text-xs text-ink/60 mt-1">{tier.feel}.</p>
+                <p className="hidden sm:block text-xs text-ink/60 mt-1">{tier.feel}.</p>
               </div>
 
-              <div className="mt-5 flex flex-col sm:flex-row gap-3">
-                <PrimaryButton to="/credit-score/check" className="text-xs px-5 py-3">
+              <div className="mt-2.5 sm:mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3">
+                <PrimaryButton to="/credit-score/check" className="text-[11px] px-2 py-2.5 sm:text-xs sm:px-5 sm:py-3 whitespace-nowrap">
                   Get My Exact Score
                 </PrimaryButton>
-                <SecondaryButton to="/credit-score/improve" className="text-xs px-5 py-3">
-                  How to Improve My Score
+                <SecondaryButton to="/credit-score/improve" className="text-[11px] px-2 py-2.5 sm:text-xs sm:px-5 sm:py-3 whitespace-nowrap">
+                  Improve My Score
                 </SecondaryButton>
               </div>
             </div>
-            <ScoreGauge score={score} animateNeedle />
+            <div className="max-w-[190px] mx-auto md:max-w-xs">
+              <ScoreGauge score={score} animateNeedle />
+            </div>
           </div>
         </div>
       </section>
@@ -236,19 +269,20 @@ export default function Home() {
       {/* Loan products */}
       <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="max-w-2xl mb-10">
+          <div className="max-w-2xl mb-3 sm:mb-10">
             <h2 className="font-display font-bold text-h2 text-teal-dark">Our lending portfolio</h2>
             <p className="mt-2 text-ink/70 text-sm sm:text-base">
               Compare ceilings and benchmark rates, then move straight to a live bank-by-bank calculator.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <p className="sm:hidden text-xs font-semibold text-teal-dark/60 mb-4">Swipe to see all 6 products →</p>
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5 sm:overflow-visible">
             {LOAN_TYPES.map((loan, i) => {
               const Icon = loan.icon;
               return (
-                <Reveal key={loan.id} index={i}>
+                <Reveal key={loan.id} index={i} className="shrink-0 w-[80%] snap-center sm:w-auto sm:shrink">
                 <div
-                  className="flex flex-col bg-white rounded-2xl border border-teal/12 p-6 hover:border-gold/60 hover:shadow-card transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                  className="h-full flex flex-col bg-white rounded-2xl border border-teal/12 p-6 hover:border-gold/60 hover:shadow-card transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-11 h-11 rounded-xl bg-teal/8 flex items-center justify-center text-teal">
@@ -323,11 +357,12 @@ export default function Home() {
       {/* Testimonials strip */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <h2 className="font-display font-bold text-h3 text-teal-dark text-center mb-10">What our borrowers say</h2>
-          <div className="grid md:grid-cols-3 gap-5">
+          <h2 className="font-display font-bold text-h3 text-teal-dark text-center mb-3 md:mb-10">What our borrowers say</h2>
+          <p className="md:hidden text-xs font-semibold text-teal-dark/60 text-center mb-4">Swipe for more →</p>
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible">
             {TESTIMONIALS.map((t, i) => (
-              <Reveal key={t.name} index={i}>
-                <figure className="bg-white rounded-2xl border border-teal/12 p-6">
+              <Reveal key={t.name} index={i} className="shrink-0 w-[80%] snap-center md:w-auto md:shrink">
+                <figure className="h-full bg-white rounded-2xl border border-teal/12 p-6">
                   <blockquote className="text-sm text-ink/75 leading-relaxed">&ldquo;{t.quote}&rdquo;</blockquote>
                   <figcaption className="mt-4 pt-4 border-t border-teal/10 flex items-center justify-between">
                     <div>

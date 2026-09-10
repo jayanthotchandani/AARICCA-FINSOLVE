@@ -154,7 +154,7 @@ export function Header() {
       <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-teal/12">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-20 flex items-center justify-between gap-6">
           <Link to="/" className="flex items-center gap-2.5 shrink-0" aria-label="Aaricca Finsales home">
-            <img src="/logo.png" alt="" className="h-11 w-auto" />
+            <img src="/logo.png" alt="" className="h-14 w-auto" />
             <span className="sr-only">Aaricca Finsales</span>
           </Link>
 
@@ -271,7 +271,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-16 pb-10">
         <div className="grid md:grid-cols-5 gap-10 pb-10 border-b border-white/10">
           <div className="md:col-span-2 space-y-4">
-            <img src="/logo.png" alt="Aaricca Finsales" className="h-10 w-auto brightness-0 invert" />
+            <img src="/logo.png" alt="Aaricca Finsales" className="h-12 w-auto brightness-0 invert" />
             <p className="text-sm leading-relaxed text-cream/70 max-w-sm">
               Next-generation financial distribution and retail banking advisory. Comparing 40+ premier
               institutional lenders to deliver unmatched interest rates and doorstep service.
