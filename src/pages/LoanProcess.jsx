@@ -5,13 +5,13 @@ import ProcessPath from "../components/ProcessPath";
 
 const STEPS = [
   { n: "01", icon: UserCheck, title: "Eligibility", desc: "Tell us your requirement. Two minutes to fill basic details." },
-  { n: "02", icon: Scale, title: "Compare", desc: "Our engine matches 40+ premier banks with a 90%+ success rate." },
+  { n: "02", icon: Scale, title: "Compare", desc: "Our engine matches 140+ premier banks and NBFCs with a 90%+ success rate." },
   { n: "03", icon: FileEdit, title: "Apply", desc: "Paperless e-KYC and digital application completed in minutes." },
   { n: "04", icon: Landmark, title: "Disbursement", desc: "Get quick sanction and funds credited directly, not in weeks." },
 ];
 
 const ADVANTAGES = [
-  { icon: Percent, title: "Automated Rate Bidding", desc: "Your profile is matched across 40+ lending institutions simultaneously to capture the lowest available interest bracket." },
+  { icon: Percent, title: "Automated Rate Bidding", desc: "Your profile is matched across 140+ lending institutions simultaneously to capture the lowest available interest bracket." },
   { icon: ShieldCheck, title: "Zero Hard Inquiry Risk", desc: "Soft underwriting checks protect your credit score from the multiple hard hits typically incurred applying at separate banks." },
   { icon: Headphones, title: "Doorstep & Digital Concierge", desc: "A dedicated credit manager coordinates property legal vetting, CA certificates, and bank approvals start to finish." },
 ];
@@ -46,7 +46,7 @@ export default function LoanProcess() {
           ))}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-teal/10 text-center">
-          {[["₹500Cr+", "Capital Disbursed"], ["40+ Banks", "Lending Partners"], ["94.8%", "Sanction Success"], ["24 Hours", "Express Approvals"]].map(([v, l]) => (
+          {[["₹500Cr+", "Capital Disbursed"], ["140+ Banks", "Lending Partners"], ["94.8%", "Sanction Success"], ["24 Hours", "Express Approvals"]].map(([v, l]) => (
             <div key={l}>
               <p className="font-display font-bold text-teal-dark">{v}</p>
               <p className="text-[11px] text-ink/55">{l}</p>

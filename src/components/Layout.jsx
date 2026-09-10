@@ -16,7 +16,7 @@ import { AccordionPanel } from "./ui";
 
 const TICKER_ITEMS = [
   { icon: PhoneCall, text: "Toll-Free 24×7 Support: 1800-AARICCA" },
-  { icon: Landmark, text: "Multi-Bank Distribution Partner: 40+ Scheduled Commercial Banks & NBFCs" },
+  { icon: Landmark, text: "Multi-Bank Distribution Partner: 140+ Scheduled Commercial Banks & NBFCs" },
   { icon: MapPin, text: "Pan-India Operations: Express Doorstep & Digital Advisory in 120+ Cities" },
   { icon: ShieldCheck, text: "Enterprise Security: ISO 27001:2025 Certified & 256-Bit SSL Encrypted" },
 ];
@@ -273,7 +273,7 @@ export function Footer() {
           <div className="md:col-span-2 space-y-4">
             <img src="/logo.png" alt="Aaricca Finsolve" className="h-12 w-auto brightness-0 invert" />
             <p className="text-sm leading-relaxed text-cream/70 max-w-sm">
-              Next-generation financial distribution and retail banking advisory. Comparing 40+ premier
+              Next-generation financial distribution and retail banking advisory. Comparing 140+ premier
               institutional lenders to deliver unmatched interest rates and doorstep service.
             </p>
             <ul className="space-y-1.5 text-sm text-cream/70">

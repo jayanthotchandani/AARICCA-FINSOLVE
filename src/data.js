@@ -339,7 +339,7 @@ export const FAQS = [
   {
     category: "General",
     q: "What is Aaricca Finsolve?",
-    a: "Aaricca Finsolve is an RBI-registered multi-bank loan distribution partner headquartered in Gurugram, Haryana. We partner with 40+ leading public and private banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
+    a: "Aaricca Finsolve is an RBI-registered multi-bank loan distribution partner headquartered in Gurugram, Haryana. We partner with 140+ leading banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
   },
   {
     category: "General",
@@ -374,12 +374,12 @@ export const FAQS = [
   {
     category: "Rates & Charges",
     q: "How are interest rates determined?",
-    a: "Your credit score, monthly income, debt-to-income ratio, employment stability, and loan category all factor in. We match your profile to the lowest available rate across our 40+ partner banks.",
+    a: "Your credit score, monthly income, debt-to-income ratio, employment stability, and loan category all factor in. We match your profile to the lowest available rate across our network of 140+ partner banks and NBFCs.",
   },
 ];
 
 export const SCORE_TIERS = [
-  { range: "750–900", label: "Excellent", note: "Prime rates & instant sanctions across all 40+ partner banks.", tone: "excellent" },
+  { range: "750–900", label: "Excellent", note: "Prime rates & instant sanctions across all 140+ partner banks.", tone: "excellent" },
   { range: "700–749", label: "Good", note: "High approval probability with standard paperwork.", tone: "good" },
   { range: "650–699", label: "Fair", note: "May require additional income proof or collateral.", tone: "fair" },
   { range: "300–649", label: "Needs Work", note: "Our advisory team assists with structured credit rebuilding.", tone: "poor" },

@@ -30,7 +30,7 @@ const CITIES = [
 const WHY_POINTS = [
   { icon: Users, text: "One dedicated advisor, start to finish — not a rotating branch staff" },
   { icon: MapPinned, text: "Doorstep document pickup, wherever you are — no branch visit needed" },
-  { icon: Zap, text: "Faster decisions — no branch queue standing between you and 40+ lenders" },
+  { icon: Zap, text: "Faster decisions — no branch queue standing between you and 140+ lenders" },
 ];
 
 export default function IndiaMap() {

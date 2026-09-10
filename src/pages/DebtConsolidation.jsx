@@ -197,7 +197,7 @@ export default function DebtConsolidation() {
               {consolidating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Analyzing your debts across 40+ partner banks…
+                  Analyzing your debts across 140+ partner banks…
                 </>
               ) : (
                 <>

@@ -26,11 +26,11 @@ const PARTNER_LOGOS = [
 
 const PILLARS = [
   { icon: Zap, title: "Speed & Express Sanction", desc: "Digital verification pipelines enable pre-approvals in minutes and bank disbursals in 24 hours." },
-  { icon: Percent, title: "Lowest Rate Guarantee", desc: "Simultaneous rate bidding across 40+ scheduled banks ensures your optimum borrowing cost." },
+  { icon: Percent, title: "Lowest Rate Guarantee", desc: "Simultaneous rate bidding across 140+ banks and NBFCs ensures your optimum borrowing cost." },
   { icon: ShieldCheck, title: "Zero Hidden Charges", desc: "No upfront fees. Complete disclosure on bank processing fees, legal charges, and stamp duties." },
   { icon: Headphones, title: "Dedicated Loan Specialist", desc: "A personal credit advisor manages your paperwork, doorstep collection, and bank coordination." },
   { icon: FileText, title: "Paperless Documentation", desc: "Seamless DigiLocker and account-aggregator integrations for instant financial verification." },
-  { icon: Landmark, title: "40+ Institutional Partners", desc: "Empaneled with tier-1 private lenders, public sector undertakings, and leading retail NBFCs." },
+  { icon: Landmark, title: "140+ Institutional Partners", desc: "Empaneled with tier-1 private lenders, public sector undertakings, and leading retail NBFCs across India." },
 ];
 
 export default function WhyAaricca() {

@@ -109,7 +109,7 @@ function RateRow({ row, offsetMs }) {
 
 const STEPS = [
   { n: "01", icon: UserCheck, title: "Eligibility", desc: "Tell us your requirement. Two minutes to fill basic details." },
-  { n: "02", icon: Scale, title: "Compare", desc: "Our engine matches 40+ premier banks and surfaces real rates." },
+  { n: "02", icon: Scale, title: "Compare", desc: "Our engine matches 140+ premier banks and NBFCs and surfaces real rates." },
   { n: "03", icon: FileEdit, title: "Apply", desc: "Paperless e-KYC and digital application completed in minutes." },
   { n: "04", icon: Landmark, title: "Disbursement", desc: "Get quick sanction and funds credited directly, not weeks later." },
 ];
@@ -156,7 +156,7 @@ export default function Home() {
               Smart financial solutions for <span className="text-teal">every dream.</span>
             </h1>
             <p className="mt-5 text-base sm:text-lg text-ink/75 leading-relaxed max-w-xl">
-              We put 40+ lenders in competition for your loan — real bank rates, one application,
+              We put 140+ banks and NBFCs in competition for your loan — real bank rates, one application,
               zero jargon, and a human advisor who calls back in 30 minutes, not a form that goes silent.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3.5">
@@ -167,7 +167,7 @@ export default function Home() {
             </div>
             <div className="mt-10 pt-6 border-t border-teal/15 grid grid-cols-3 gap-6 max-w-md text-center sm:text-left">
               <StatBlock value="₹500Cr+" label="Disbursed Capital" />
-              <StatBlock value="40+" label="Lending Partners" />
+              <StatBlock value="140+" label="Lending Partners" />
               <StatBlock value="24 Hrs" label="Express Sanctions" />
             </div>
           </div>
