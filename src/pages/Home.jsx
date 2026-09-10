@@ -165,7 +165,7 @@ export default function Home() {
               </PrimaryButton>
               <SecondaryButton to="/credit-score/check">Check Free Credit Score</SecondaryButton>
             </div>
-            <div className="mt-10 pt-6 border-t border-teal/15 grid grid-cols-3 gap-6 max-w-md">
+            <div className="mt-10 pt-6 border-t border-teal/15 grid grid-cols-3 gap-6 max-w-md text-center sm:text-left">
               <StatBlock value="₹500Cr+" label="Disbursed Capital" />
               <StatBlock value="40+" label="Lending Partners" />
               <StatBlock value="24 Hrs" label="Express Sanctions" />

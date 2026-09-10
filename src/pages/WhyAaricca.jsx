@@ -65,12 +65,12 @@ export default function WhyAaricca() {
         <div className="text-center mb-6">
           <h2 className="font-display font-bold text-h3 text-teal-dark">Our lending partners</h2>
         </div>
-        <div className="relative overflow-hidden bg-white rounded-2xl border border-teal/12 py-10">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent z-10" />
+        <div className="relative overflow-hidden py-4">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-cream to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-cream to-transparent z-10" />
           <div className="flex w-max animate-ticker">
             {[...PARTNER_LOGOS, ...PARTNER_LOGOS].map((bank, i) => (
-              <div key={i} className="flex items-center justify-center shrink-0 px-8 sm:px-10" style={{ width: "180px", height: "72px" }}>
+              <div key={i} className="flex items-center justify-center shrink-0 px-8 sm:px-10" style={{ width: "220px", height: "104px" }}>
                 <img src={bank.src} alt={bank.name} title={bank.name} className="max-h-full max-w-full object-contain" />
               </div>
             ))}
