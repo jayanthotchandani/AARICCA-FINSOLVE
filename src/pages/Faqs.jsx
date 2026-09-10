@@ -72,7 +72,7 @@ export default function Faqs() {
 
       <div className="bg-teal-dark rounded-2xl p-8 text-center text-white">
         <h2 className="font-display font-semibold text-lg">Still have questions?</h2>
-        <p className="text-sm text-cream/70 mt-1 mb-4">Our senior loan officers in Jaipur are available for phone or doorstep consultations.</p>
+        <p className="text-sm text-cream/70 mt-1 mb-4">Our senior loan officers in Gurugram are available for phone or doorstep consultations.</p>
         <PrimaryButton to="/apply" className="!bg-gold !text-teal-dark hover:!bg-gold-dark hover:!text-white">
           Request Free Callback
         </PrimaryButton>

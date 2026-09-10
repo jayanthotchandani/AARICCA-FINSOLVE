@@ -5,7 +5,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { insertLead, listLeads, deleteLead } from "./db.js";
-import { checkCredentials, issueSession, clearSession, requireAuth, isAuthed } from "./auth.js";
+import { authenticateUser, issueSession, clearSession, requireAuth, requireAdmin, getSessionUser } from "./auth.js";
+import { listUsers, addUser, deleteUser } from "./users.js";
 import { requestOtp, resendOtp, verifyOtp } from "./creditScore.js";
 import { listRatesByLoan, addRate, updateRate, deleteRate } from "./rates.js";
 
@@ -85,10 +86,11 @@ app.post("/api/credit-score/verify-otp", (req, res) => {
 // --- Auth ---
 app.post("/api/auth/login", (req, res) => {
   const { username, password } = req.body || {};
-  if (!checkCredentials(username, password)) {
+  const user = authenticateUser(username, password);
+  if (!user) {
     return res.status(401).json({ error: "Incorrect username or password" });
   }
-  issueSession(res);
+  issueSession(res, user);
   res.json({ ok: true });
 });
 
@@ -98,7 +100,37 @@ app.post("/api/auth/logout", (req, res) => {
 });
 
 app.get("/api/auth/me", (req, res) => {
-  res.json({ authenticated: isAuthed(req) });
+  const user = getSessionUser(req);
+  res.json({ authenticated: !!user, user });
+});
+
+// --- Team accounts: admin-only. The root admin (from .env) is the only
+// account that starts with access; they use this to create logins for
+// teammates, who get "staff" role — everything except this Team tab itself. ---
+app.get("/api/users", requireAuth, requireAdmin, (req, res) => {
+  res.json(listUsers());
+});
+
+app.post("/api/users", requireAuth, requireAdmin, (req, res) => {
+  const { username, password, role } = req.body || {};
+  if (!username || !password || password.length < 6) {
+    return res.status(400).json({ error: "Username and a password of at least 6 characters are required" });
+  }
+  try {
+    const user = addUser({ username: username.trim(), password, role });
+    res.status(201).json(user);
+  } catch (err) {
+    if (String(err.message).includes("UNIQUE")) {
+      return res.status(409).json({ error: `"${username}" is already taken` });
+    }
+    res.status(500).json({ error: "Could not create the account" });
+  }
+});
+
+app.delete("/api/users/:id", requireAuth, requireAdmin, (req, res) => {
+  const result = deleteUser(Number(req.params.id));
+  if (!result.ok) return res.status(400).json({ error: result.error });
+  res.json({ ok: true });
 });
 
 // --- Protected: the internal dashboard reads from here ---

@@ -388,7 +388,7 @@ export default function Home() {
               Get your financial helper in 30 minutes
             </h2>
             <p className="mt-4 text-cream/75 text-sm sm:text-base leading-relaxed">
-              Skip the queues. Leave your number and our senior credit advisor in Jaipur will call to
+              Skip the queues. Leave your number and our senior credit advisor in Gurugram will call to
               structure your best loan package — no algorithm decides, a person does.
             </p>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">

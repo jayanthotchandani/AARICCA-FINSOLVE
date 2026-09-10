@@ -317,7 +317,7 @@ export const TESTIMONIALS = [
     role: "Proprietor, Precision Engineering",
     loan: "Business Loan",
     amount: "₹45 Lakhs",
-    quote: "Aaricca Finsales secured our working capital expansion loan within 48 hours when our traditional branch delayed approvals. Flawless doorstep documentation in Jaipur.",
+    quote: "Aaricca Finsales secured our working capital expansion loan within 48 hours when our traditional branch delayed approvals. Flawless doorstep documentation in Gurugram.",
   },
   {
     name: "Dr. Priyamvada Sharma",
@@ -339,7 +339,7 @@ export const FAQS = [
   {
     category: "General",
     q: "What is Aaricca Finsales?",
-    a: "Aaricca Finsales is an RBI-registered multi-bank loan distribution partner headquartered in Jaipur, Rajasthan. We partner with 40+ leading public and private banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
+    a: "Aaricca Finsales is an RBI-registered multi-bank loan distribution partner headquartered in Gurugram, Haryana. We partner with 40+ leading public and private banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
   },
   {
     category: "General",

@@ -247,7 +247,35 @@ input[type="range"]::-webkit-slider-runnable-track {
   }
 }
 
+/* India-map card flip (IndiaMap.jsx) — a real 3D flip rather than a
+   cross-fade, so the map visibly turns over into its "why no branches"
+   explanation and back. The back face is absolutely positioned over the
+   front so both faces share one box and the card never jumps height. */
+.flip-card-scene {
+  perspective: 2000px;
+}
+.flip-card-inner {
+  position: relative;
+  transition: transform 700ms var(--ease-in-out);
+  transform-style: preserve-3d;
+}
+.flip-card-inner[data-flipped="true"] {
+  transform: rotateY(180deg);
+}
+.flip-card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-card-face-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .flip-card-inner {
+    transition: none !important;
+  }
   .animate-ticker,
   .rise-in,
   .fade-swap-enter,

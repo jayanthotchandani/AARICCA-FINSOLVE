@@ -278,7 +278,7 @@ export function Footer() {
             </p>
             <ul className="space-y-1.5 text-sm text-cream/70">
               <li className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gold" /> Jaipur, Rajasthan, India
+                <MapPin className="w-4 h-4 text-gold" /> Gurugram, Haryana, India
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-gold" /> support@aariccafinsales.com

@@ -54,3 +54,20 @@ export function updateBankRate(id, rate) {
 export function deleteBankRate(id) {
   return sendJson("DELETE", `/api/rates/${id}`);
 }
+
+// Team accounts: admin-only (see server/users.js). The internal tool's Team
+// tab is hidden entirely for a non-admin session, and the server enforces
+// the same rule independently, so these calls 403 for anyone else regardless.
+export async function getUsers() {
+  const res = await fetch("/api/users");
+  if (!res.ok) throw new Error("Could not load team accounts");
+  return res.json();
+}
+
+export function addTeamUser(payload) {
+  return sendJson("POST", "/api/users", payload);
+}
+
+export function deleteTeamUser(id) {
+  return sendJson("DELETE", `/api/users/${id}`);
+}

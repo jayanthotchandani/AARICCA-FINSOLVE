@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail, Trash2, Plus, Pencil, X, Check } from "lucide-react";
+import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail, Trash2, Plus, Pencil, X, Check, ShieldCheck, UserPlus } from "lucide-react";
 import { inputClass, Field, PrimaryButton } from "../components/ui";
 import { LOAN_TYPES } from "../data";
-import { getRates, addBankRate, updateBankRate, deleteBankRate } from "../api";
+import { getRates, addBankRate, updateBankRate, deleteBankRate, getUsers, addTeamUser, deleteTeamUser } from "../api";
 
 const SOURCE_LABELS = {
   apply: "Loan Application",
@@ -28,14 +28,18 @@ function daysAgoISO(n) {
 
 export default function LeadQueue() {
   const [authChecked, setAuthChecked] = useState(false);
-  const [authed, setAuthed] = useState(false);
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    fetch("/api/auth/me")
+  const checkAuth = useCallback(() => {
+    return fetch("/api/auth/me")
       .then((r) => r.json())
-      .then((d) => setAuthed(d.authenticated))
+      .then((d) => setUser(d.authenticated ? d.user : null))
       .finally(() => setAuthChecked(true));
   }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   if (!authChecked) {
     return (
@@ -45,7 +49,11 @@ export default function LeadQueue() {
     );
   }
 
-  return authed ? <Dashboard onLoggedOut={() => setAuthed(false)} /> : <LoginGate onLoggedIn={() => setAuthed(true)} />;
+  return user ? (
+    <Dashboard user={user} onLoggedOut={() => setUser(null)} />
+  ) : (
+    <LoginGate onLoggedIn={checkAuth} />
+  );
 }
 
 function LoginGate({ onLoggedIn }) {
@@ -127,7 +135,7 @@ function LoginGate({ onLoggedIn }) {
   );
 }
 
-function Dashboard({ onLoggedOut }) {
+function Dashboard({ user, onLoggedOut }) {
   const [tab, setTab] = useState("leads");
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -181,7 +189,7 @@ function Dashboard({ onLoggedOut }) {
           <div>
             <p className="text-[11px] font-semibold text-ink/45 uppercase tracking-wide">Internal Tool · /internal-leads-portal</p>
             <h1 className="font-display font-bold text-2xl text-teal-dark">
-              {tab === "leads" ? "Call Center Lead Queue" : "Bank Rates"}
+              {tab === "leads" ? "Call Center Lead Queue" : tab === "rates" ? "Bank Rates" : "Team Accounts"}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -203,6 +211,7 @@ function Dashboard({ onLoggedOut }) {
           {[
             ["leads", "Lead Queue"],
             ["rates", "Bank Rates"],
+            ...(user.role === "admin" ? [["team", "Team"]] : []),
           ].map(([key, label]) => (
             <button
               key={key}
@@ -251,8 +260,10 @@ function Dashboard({ onLoggedOut }) {
               </div>
             )}
           </>
-        ) : (
+        ) : tab === "rates" ? (
           <RatesTab />
+        ) : (
+          <TeamTab currentUsername={user.username} />
         )}
       </div>
     </div>
@@ -581,5 +592,166 @@ function ExportBar() {
         <Download className="w-3.5 h-3.5" /> Download CSV
       </button>
     </div>
+  );
+}
+
+function TeamTab({ currentUsername }) {
+  const [users, setUsers] = useState(null);
+  const [error, setError] = useState("");
+  const [adding, setAdding] = useState(false);
+
+  const load = useCallback(() => {
+    getUsers()
+      .then(setUsers)
+      .catch((err) => setError(err.message));
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function handleDelete(id) {
+    if (!window.confirm("Remove this teammate's access? They won't be able to log in anymore.")) return;
+    try {
+      await deleteTeamUser(id);
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+    } catch (err) {
+      window.alert(err.message);
+    }
+  }
+
+  if (error) return <p className="text-sm text-warn">{error}</p>;
+  if (!users) {
+    return (
+      <div className="flex items-center justify-center py-16 text-ink/40">
+        <Loader2 className="w-5 h-5 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <p className="text-xs text-ink/55 mb-5">
+        Only admin accounts can see this tab. Accounts created here can log in to the Lead Queue and Bank Rates
+        tabs, but not this one — they can't add or remove other teammates.
+      </p>
+
+      <div className="bg-white rounded-xl border border-teal/12 divide-y divide-teal/10 mb-5">
+        {users.map((u) => (
+          <div key={u.id} className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-teal/10 text-teal flex items-center justify-center shrink-0">
+                {u.role === "admin" ? <ShieldCheck className="w-4 h-4" /> : <span className="text-xs font-bold">{u.username[0]?.toUpperCase()}</span>}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-ink flex items-center gap-1.5">
+                  {u.username}
+                  {u.username === currentUsername && <span className="text-[10px] text-ink/40 font-normal">(you)</span>}
+                </p>
+                <p className="text-[11px] text-ink/50 capitalize">
+                  {u.role}
+                  {!!u.is_protected && " · root account"}
+                </p>
+              </div>
+            </div>
+            {!u.is_protected && (
+              <button
+                onClick={() => handleDelete(u.id)}
+                aria-label={`Remove ${u.username}`}
+                className="p-2 rounded-lg text-ink/30 hover:bg-warn/10 hover:text-warn transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {adding ? (
+        <AddUserForm
+          onAdded={(user) => {
+            setUsers((prev) => [...prev, user]);
+            setAdding(false);
+          }}
+          onCancel={() => setAdding(false)}
+        />
+      ) : (
+        <button
+          onClick={() => setAdding(true)}
+          className="flex items-center gap-1.5 text-sm font-semibold text-teal hover:text-teal-dark transition-colors"
+        >
+          <UserPlus className="w-4 h-4" /> Add a teammate
+        </button>
+      )}
+    </div>
+  );
+}
+
+function AddUserForm({ onAdded, onCancel }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("staff");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setSubmitting(true);
+    try {
+      const user = await addTeamUser({ username: username.trim(), password, role });
+      onAdded(user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-teal/12 p-4 space-y-3">
+      <div className="grid sm:grid-cols-2 gap-3">
+        <Field label="Username" required>
+          <input
+            autoFocus
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="e.g. priya.advisor"
+            className={inputClass}
+          />
+        </Field>
+        <Field label="Password" required hint="At least 6 characters">
+          <input
+            required
+            type="password"
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Temporary password"
+            className={inputClass}
+          />
+        </Field>
+      </div>
+      <Field label="Role">
+        <select value={role} onChange={(e) => setRole(e.target.value)} className={inputClass}>
+          <option value="staff">Staff — Lead Queue & Bank Rates only</option>
+          <option value="admin">Admin — can also manage the team</option>
+        </select>
+      </Field>
+      {error && <p className="text-xs text-warn">{error}</p>}
+      <div className="flex items-center gap-2 pt-1">
+        <PrimaryButton type="submit" disabled={submitting} className="text-xs px-4 py-2.5">
+          {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Create account"}
+        </PrimaryButton>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-xs font-semibold text-ink/50 hover:text-ink px-3 py-2.5"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }
