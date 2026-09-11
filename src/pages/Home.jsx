@@ -82,7 +82,7 @@ function RateRow({ row, offsetMs }) {
     <Link
       to={`/loans/${row.id}`}
       className="flex items-center justify-between p-3 rounded-lg bg-surface hover:bg-teal/5 border border-transparent hover:border-teal/15 transition-[background-color,border-color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group"
-      style={justUpdated ? { backgroundColor: "#1B7F7E14", borderColor: "#1B7F7E30" } : undefined}
+      style={justUpdated ? { backgroundColor: "#14544F14", borderColor: "#14544F30" } : undefined}
     >
       <div>
         <p className="text-sm font-semibold text-ink">{row.label}</p>

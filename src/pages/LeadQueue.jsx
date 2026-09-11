@@ -510,7 +510,7 @@ function LeadCard({ lead, justArrived, onDelete }) {
   return (
     <div
       className="group relative bg-white rounded-xl border border-teal/12 p-4 transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
-      style={justArrived ? { borderColor: "#1B7F7E", boxShadow: "0 0 0 3px #1B7F7E22" } : undefined}
+      style={justArrived ? { borderColor: "#14544F", boxShadow: "0 0 0 3px #14544F22" } : undefined}
     >
       <button
         onClick={() => onDelete(lead.id)}

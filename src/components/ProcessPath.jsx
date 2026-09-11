@@ -126,7 +126,7 @@ function Step({ step, index, total, progress, reducedMotion }) {
         className={`absolute start-6 sm:start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shrink-0 border-2 bg-white shadow-card transition-[color,border-color,transform] duration-[400ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${
           lit ? "scale-105" : "scale-100"
         }`}
-        style={{ borderColor: lit ? "#1B7F7E" : "#1B7F7E22", color: lit ? "#1B7F7E" : "#9E9E9E" }}
+        style={{ borderColor: lit ? "#14544F" : "#14544F22", color: lit ? "#14544F" : "#9E9E9E" }}
       >
         <step.icon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
       </div>

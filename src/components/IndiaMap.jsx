@@ -77,7 +77,7 @@ export default function IndiaMap() {
                     tabIndex={0}
                     aria-label={c.name}
                   >
-                    <circle cx={c.x} cy={c.y} r={active === c.id ? 15 : 9} fill={active === c.id ? "#D4A574" : "#2E9C9A"} stroke="#0B3B3A" strokeWidth="3" />
+                    <circle cx={c.x} cy={c.y} r={active === c.id ? 15 : 9} fill={active === c.id ? "#D4A574" : "#269E95"} stroke="#0B3B3A" strokeWidth="3" />
                     {active === c.id && <circle cx={c.x} cy={c.y} r="24" fill="none" stroke="#D4A574" strokeWidth="2.5" opacity="0.6" />}
                   </g>
                 ))}

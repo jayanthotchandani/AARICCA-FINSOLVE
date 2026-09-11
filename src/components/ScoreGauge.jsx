@@ -5,8 +5,8 @@ const MAX = 900;
 const BANDS = [
   { from: 300, to: 649, color: "#F44336" },
   { from: 650, to: 699, color: "#D4A574" },
-  { from: 700, to: 749, color: "#2E9C9A" },
-  { from: 750, to: 900, color: "#1B7F7E" },
+  { from: 700, to: 749, color: "#269E95" },
+  { from: 750, to: 900, color: "#14544F" },
 ];
 const NEEDLE_DURATION = 200;
 
@@ -85,14 +85,14 @@ export default function ScoreGauge({ score = 742, animateNeedle = false }) {
     >
       <defs>
         <filter id="gaugeShadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#1B7F7E" floodOpacity="0.18" />
+          <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#14544F" floodOpacity="0.18" />
         </filter>
         <filter id="needleShadow" x="-60%" y="-60%" width="220%" height="220%">
           <feDropShadow dx="0" dy="1.5" stdDeviation="2" floodColor="#20302F" floodOpacity="0.35" />
         </filter>
         <linearGradient id="needleGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#155F5E" />
-          <stop offset="100%" stopColor="#1B7F7E" />
+          <stop offset="0%" stopColor="#0B2F2C" />
+          <stop offset="100%" stopColor="#14544F" />
         </linearGradient>
       </defs>
 
@@ -125,7 +125,7 @@ export default function ScoreGauge({ score = 742, animateNeedle = false }) {
         <path d={`M -8 0 L 0 -4.5 L ${needleLength} 0 L 0 4.5 Z`} fill="url(#needleGrad)" />
       </g>
       <circle cx={cx} cy={cy} r="11" fill="#FFFFFF" filter="url(#needleShadow)" />
-      <circle cx={cx} cy={cy} r="7" fill="#155F5E" />
+      <circle cx={cx} cy={cy} r="7" fill="#0B2F2C" />
 
       <text
         x={cx}
@@ -134,7 +134,7 @@ export default function ScoreGauge({ score = 742, animateNeedle = false }) {
         fontFamily="Poppins, sans-serif"
         fontWeight="700"
         fontSize="40"
-        fill="#155F5E"
+        fill="#0B2F2C"
         letterSpacing="-0.5"
       >
         {displayedScore}
@@ -163,8 +163,8 @@ export default function ScoreGauge({ score = 742, animateNeedle = false }) {
 }
 
 export function tierForScore(score) {
-  if (score >= 750) return { label: "Excellent", note: "Quick Approval Tier", color: "#1B7F7E", bg: "#EAF6F5", feel: "Prime — lenders compete for you" };
-  if (score >= 700) return { label: "Good", note: "High Approval Probability", color: "#155F5E", bg: "#EEF7F6", feel: "Strong — most banks approve fast" };
+  if (score >= 750) return { label: "Excellent", note: "Quick Approval Tier", color: "#14544F", bg: "#EAF6F5", feel: "Prime — lenders compete for you" };
+  if (score >= 700) return { label: "Good", note: "High Approval Probability", color: "#0B2F2C", bg: "#EEF7F6", feel: "Strong — most banks approve fast" };
   if (score >= 650) return { label: "Fair", note: "Standard Processing", color: "#B8865A", bg: "#FBF2E8", feel: "Okay — approvals possible, rates less sharp" };
   return { label: "Needs Work", note: "Assisted Credit Rebuilding", color: "#C0392B", bg: "#FDECEA", feel: "Risky — approvals get harder from here" };
 }

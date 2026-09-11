@@ -10,8 +10,8 @@ import { submitLead, requestCreditScoreOtp, resendCreditScoreOtp, verifyCreditSc
 const PAN_RE = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 
 const TIER_STYLES = {
-  excellent: { bg: "#EAF6F5", border: "#1B7F7E33", text: "#155F5E" },
-  good: { bg: "#EEF7F6", border: "#2E9C9A33", text: "#1B7F7E" },
+  excellent: { bg: "#EAF6F5", border: "#14544F33", text: "#0B2F2C" },
+  good: { bg: "#EEF7F6", border: "#269E9533", text: "#14544F" },
   fair: { bg: "#FBF2E8", border: "#D4A57444", text: "#B8865A" },
   poor: { bg: "#FDECEA", border: "#F4433633", text: "#C0392B" },
 };
