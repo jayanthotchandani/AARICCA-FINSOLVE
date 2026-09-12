@@ -281,7 +281,7 @@ export function Footer() {
                 <MapPin className="w-4 h-4 text-gold" /> Gurugram, Haryana, India
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-gold" /> support@aariccafinsales.com
+                <Mail className="w-4 h-4 text-gold" /> sales@aaricca.com
               </li>
               <li className="flex items-center gap-2">
                 <PhoneCall className="w-4 h-4 text-gold" /> 1800-AARICCA (Toll Free)
