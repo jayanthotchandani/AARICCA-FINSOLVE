@@ -317,7 +317,7 @@ export const TESTIMONIALS = [
     role: "Proprietor, Precision Engineering",
     loan: "Business Loan",
     amount: "₹45 Lakhs",
-    quote: "Aaricca Finsolve secured our working capital expansion loan within 48 hours when our traditional branch delayed approvals. Flawless doorstep documentation in Gurugram.",
+    quote: "Aaricca Finsales secured our working capital expansion loan within 48 hours when our traditional branch delayed approvals. Flawless doorstep documentation in Gurugram.",
   },
   {
     name: "Dr. Priyamvada Sharma",
@@ -338,13 +338,13 @@ export const TESTIMONIALS = [
 export const FAQS = [
   {
     category: "General",
-    q: "What is Aaricca Finsolve?",
-    a: "Aaricca Finsolve is an RBI-registered multi-bank loan distribution partner headquartered in Gurugram, Haryana. We partner with 140+ leading banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
+    q: "What is Aaricca Finsales?",
+    a: "Aaricca Finsales is an RBI-registered multi-bank loan distribution partner headquartered in Gurugram, Haryana. We partner with 140+ leading banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
   },
   {
     category: "General",
     q: "Do I have to pay any upfront advisory or processing charges?",
-    a: "No. Aaricca Finsolve provides free loan comparison, doorstep documentation, and application processing. All bank processing fees and stamp duties are stated in your official sanction letter with zero hidden markups.",
+    a: "No. Aaricca Finsales provides free loan comparison, doorstep documentation, and application processing. All bank processing fees and stamp duties are stated in your official sanction letter with zero hidden markups.",
   },
   {
     category: "Loan Process",
