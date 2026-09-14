@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail, Trash2, Plus, Pencil, X, Check, ShieldCheck, UserPlus } from "lucide-react";
+import { Download, Lock, PhoneCall, LogOut, Loader2, Radio, Mail, Trash2, Plus, Pencil, X, Check, ShieldCheck, UserPlus, Clock } from "lucide-react";
 import { inputClass, Field, PrimaryButton } from "../components/ui";
 import { LOAN_TYPES } from "../data";
 import { getRates, addBankRate, updateBankRate, deleteBankRate, getUsers, addTeamUser, deleteTeamUser } from "../api";
@@ -540,10 +540,15 @@ function LeadCard({ lead, justArrived, onDelete }) {
           <Mail className="w-3 h-3" /> {lead.email}
         </p>
       )}
+      {details?.preferredCallTime && (
+        <p className="text-xs font-semibold text-teal-dark flex items-center gap-1 mt-1">
+          <Clock className="w-3 h-3" /> Call: {details.preferredCallTime}
+        </p>
+      )}
       {details && (
         <ul className="mt-1.5 space-y-0.5">
           {Object.entries(details)
-            .filter(([, v]) => v !== null && v !== undefined && v !== "")
+            .filter(([k, v]) => k !== "preferredCallTime" && v !== null && v !== undefined && v !== "")
             .slice(0, 3)
             .map(([k, v]) => (
               <li key={k} className="text-[11px] text-ink/50">

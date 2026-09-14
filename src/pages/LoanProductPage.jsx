@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
 import { ChevronDown, Check, CheckCircle2, Loader2, FileText } from "lucide-react";
-import { LOAN_TYPES, BANKS_BY_LOAN } from "../data";
-import { BackLink, PrimaryButton, Field, inputClass } from "../components/ui";
+import { LOAN_TYPES, BANKS_BY_LOAN, OFFICE_NOTE_FULL } from "../data";
+import { BackLink, PrimaryButton, Field, inputClass, PreferredCallTimeField, formatCallbackWindow, OfficeNote } from "../components/ui";
 import { submitLead, getRates } from "../api";
 
 function formatINR(n) {
@@ -84,6 +84,8 @@ export default function LoanProductPage() {
   const [error, setError] = useState("");
   const [eligForm, setEligForm] = useState({ name: "", phone: "", income: "", employment: "Salaried", debts: "" });
   const phoneValid = /^\d{10}$/.test(eligForm.phone);
+  const [callDay, setCallDay] = useState("Today");
+  const [callBand, setCallBand] = useState("");
 
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
@@ -120,7 +122,15 @@ export default function LoanProductPage() {
               value={amount}
               display={formatINR(amount)}
               min={loan.id === "home" || loan.id === "lap" ? 500000 : 50000}
-              max={loan.id === "home" ? 50000000 : loan.id === "lap" ? 100000000 : 4000000}
+              max={
+                loan.id === "home"
+                  ? 50000000
+                  : loan.id === "lap"
+                  ? 100000000
+                  : loan.id === "personal" || loan.id === "business"
+                  ? 5000000
+                  : 4000000
+              }
               step={loan.id === "home" || loan.id === "lap" ? 100000 : 25000}
               onChange={setAmount}
             />
@@ -217,6 +227,7 @@ export default function LoanProductPage() {
             <CheckCircle2 className="w-12 h-12 text-teal mx-auto mb-3" />
             <h3 className="font-display font-semibold text-lg text-teal-dark">You're on the list.</h3>
             <p className="text-sm text-ink/65 mt-1">An advisor reviews your profile personally and calls within 30 minutes.</p>
+            <p className="text-xs text-ink/50 mt-3 max-w-sm mx-auto leading-relaxed">{OFFICE_NOTE_FULL}</p>
           </div>
         ) : (
           <>
@@ -237,6 +248,7 @@ export default function LoanProductPage() {
                     loanType: loan.title,
                     amount: formatINR(amount),
                     details: {
+                      preferredCallTime: formatCallbackWindow(callDay, callBand),
                       bank: bank.name,
                       rate: `${rate.toFixed(2)}%`,
                       tenureYears,
@@ -313,8 +325,9 @@ export default function LoanProductPage() {
                   />
                 </Field>
               </div>
+              <PreferredCallTimeField day={callDay} band={callBand} onDayChange={setCallDay} onBandChange={setCallBand} />
               {error && <p className="text-xs text-warn">{error}</p>}
-              <PrimaryButton type="submit" full disabled={submitting || !phoneValid}>
+              <PrimaryButton type="submit" full disabled={submitting || !phoneValid || !callBand}>
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
@@ -323,6 +336,7 @@ export default function LoanProductPage() {
                   "Get Best Options from Our Advisor"
                 )}
               </PrimaryButton>
+              <OfficeNote />
               <ul className="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-ink/55 pt-1">
                 <li className="flex items-center gap-1"><Check className="w-3 h-3 text-teal" /> Soft inquiry — no impact to your score</li>
                 <li className="flex items-center gap-1"><Check className="w-3 h-3 text-teal" /> Advisor calls within 30 minutes</li>

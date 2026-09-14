@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { CreditCard, Landmark, ShoppingBag, Plus, X, ArrowLeftRight, ClipboardList, ChevronDown, CheckCircle2, Loader2, Sparkles, Gauge } from "lucide-react";
-import { BackLink, PrimaryButton, Field, inputClass, AccordionPanel } from "../components/ui";
+import { BackLink, PrimaryButton, Field, inputClass, AccordionPanel, PreferredCallTimeField, formatCallbackWindow, OfficeNote } from "../components/ui";
 import AutoCarousel from "../components/AutoCarousel";
 import { submitLead } from "../api";
+import { OFFICE_NOTE_FULL } from "../data";
 
 const ICONS = [CreditCard, Landmark, ShoppingBag];
 
@@ -55,6 +56,8 @@ export default function DebtConsolidation() {
   const [reduction, setReduction] = useState(null);
   const [contact, setContact] = useState({ name: "", phone: "" });
   const phoneValid = /^\d{10}$/.test(contact.phone);
+  const [callDay, setCallDay] = useState("Today");
+  const [callBand, setCallBand] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
@@ -293,6 +296,7 @@ export default function DebtConsolidation() {
             <CheckCircle2 className="w-12 h-12 text-teal mx-auto mb-3" />
             <h3 className="font-display font-semibold text-lg text-teal-dark">Your debts are with our advisor.</h3>
             <p className="text-sm text-ink/65 mt-1">We'll call within 30 minutes with a specific recommendation.</p>
+            <p className="text-xs text-ink/50 mt-3 max-w-sm mx-auto leading-relaxed">{OFFICE_NOTE_FULL}</p>
           </div>
         ) : (
           <>
@@ -311,6 +315,7 @@ export default function DebtConsolidation() {
                     name: contact.name,
                     phone: contact.phone,
                     details: {
+                      preferredCallTime: formatCallbackWindow(callDay, callBand),
                       cibilScore: cibilScore || null,
                       debts: debts.map((d) => ({
                         type: d.type,
@@ -356,9 +361,12 @@ export default function DebtConsolidation() {
                   <p className="text-[11px] text-warn mt-1">Enter a valid 10-digit mobile number.</p>
                 )}
               </Field>
+              <div className="sm:col-span-2">
+                <PreferredCallTimeField day={callDay} band={callBand} onDayChange={setCallDay} onBandChange={setCallBand} />
+              </div>
               {submitError && <p className="text-xs text-warn sm:col-span-2">{submitError}</p>}
               <div className="sm:col-span-2">
-                <PrimaryButton type="submit" full disabled={submitting || !phoneValid}>
+                <PrimaryButton type="submit" full disabled={submitting || !phoneValid || !callBand}>
                   {submitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
@@ -367,6 +375,7 @@ export default function DebtConsolidation() {
                     "Get My Advisor's Recommendation"
                   )}
                 </PrimaryButton>
+                <OfficeNote className="mt-3" />
               </div>
             </form>
           </>

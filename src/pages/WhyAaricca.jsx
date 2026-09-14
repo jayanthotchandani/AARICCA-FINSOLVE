@@ -98,6 +98,10 @@ export default function WhyAaricca() {
       <div className="text-center">
         <PrimaryButton to="/apply">Start Your Application</PrimaryButton>
       </div>
+
+      <p className="text-center text-[11px] text-ink/40 mt-8 max-w-lg mx-auto leading-relaxed">
+        Aaricca Finsales operates as a corporate DSA (Direct Selling Agent) in partnership with First Advisor.
+      </p>
     </div>
   );
 }

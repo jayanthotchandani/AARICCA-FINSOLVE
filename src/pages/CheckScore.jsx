@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShieldCheck } from "lucide-react";
-import { SCORE_TIERS } from "../data";
-import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass } from "../components/ui";
+import { ShieldCheck, CheckCircle2, Loader2, Rocket } from "lucide-react";
+import { SCORE_TIERS, OFFICE_NOTE_FULL } from "../data";
+import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass, PreferredCallTimeField, formatCallbackWindow, OfficeNote } from "../components/ui";
 import ScoreGauge, { tierForScore } from "../components/ScoreGauge";
 import OtpModal from "../components/OtpModal";
 import { submitLead, requestCreditScoreOtp, resendCreditScoreOtp, verifyCreditScoreOtp } from "../api";
@@ -29,7 +29,9 @@ export default function CheckScore() {
   });
   const phoneValid = /^\d{10}$/.test(form.phone);
   const panValid = PAN_RE.test(form.pan);
-  const canSubmit = phoneValid && panValid && form.dob && form.consent;
+  const [callDay, setCallDay] = useState("Today");
+  const [callBand, setCallBand] = useState("");
+  const canSubmit = phoneValid && panValid && form.dob && form.consent && callBand;
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -38,6 +40,42 @@ export default function CheckScore() {
   const [otpState, setOtpState] = useState(null); // { requestId, maskedPhone }
   const [otpError, setOtpError] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
+
+  // Stand-in lead-capture flow while the real bureau API integration is
+  // still under negotiation: no live pull, just a self-reported score (if
+  // the user happens to know it) and a callback. The instant-pull form
+  // below stays fully coded but visually disabled — swap the wrapper back
+  // in once the real API is live, nothing else needs to change.
+  const [quickForm, setQuickForm] = useState({ name: "", phone: "", score: "" });
+  const quickPhoneValid = /^\d{10}$/.test(quickForm.phone);
+  const quickScoreValid = !quickForm.score || (Number(quickForm.score) >= 300 && Number(quickForm.score) <= 900);
+  const [quickCallDay, setQuickCallDay] = useState("Today");
+  const [quickCallBand, setQuickCallBand] = useState("");
+  const [quickSubmitting, setQuickSubmitting] = useState(false);
+  const [quickError, setQuickError] = useState("");
+  const [quickSubmitted, setQuickSubmitted] = useState(false);
+
+  async function handleQuickSubmit(e) {
+    e.preventDefault();
+    setQuickError("");
+    setQuickSubmitting(true);
+    try {
+      await submitLead({
+        source: "check_score",
+        name: quickForm.name,
+        phone: quickForm.phone,
+        details: {
+          preferredCallTime: formatCallbackWindow(quickCallDay, quickCallBand),
+          selfReportedCibilScore: quickForm.score || null,
+        },
+      });
+      setQuickSubmitted(true);
+    } catch (err) {
+      setQuickError(err.message);
+    } finally {
+      setQuickSubmitting(false);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -69,7 +107,13 @@ export default function CheckScore() {
         name: form.name,
         phone: form.phone,
         email: form.email,
-        details: { pan: form.pan.toUpperCase(), dob: form.dob, monthlyIncome: form.income, employment: form.employment },
+        details: {
+          preferredCallTime: formatCallbackWindow(callDay, callBand),
+          pan: form.pan.toUpperCase(),
+          dob: form.dob,
+          monthlyIncome: form.income,
+          employment: form.employment,
+        },
       });
       setResult(score);
       setOtpState(null);
@@ -98,11 +142,94 @@ export default function CheckScore() {
       <div className="max-w-2xl mx-auto text-center mb-10">
         <h1 className="font-display font-bold text-h1-sm sm:text-h1 text-teal-dark">Free Credit Score Check &amp; Advisory</h1>
         <p className="mt-3 text-ink/70 text-sm sm:text-base">
-          Discover your bureau health score and unlock pre-approved rates — zero impact to your credit file.
+          Know your score? Tell us and skip the wait. Instant bureau pull is on its way — until then, a real
+          advisor calls you with every option it unlocks.
         </p>
       </div>
 
       <div className="bg-white rounded-2xl border-2 border-teal/15 p-6 sm:p-8 mb-8">
+        {quickSubmitted ? (
+          <div className="fade-swap-enter text-center py-6">
+            <CheckCircle2 className="w-12 h-12 text-teal mx-auto mb-3" />
+            <h3 className="font-display font-semibold text-lg text-teal-dark">Got it — your advisor is on it.</h3>
+            <p className="text-sm text-ink/65 mt-1">We'll call within 24 hours with every option available to you.</p>
+            <p className="text-xs text-ink/50 mt-3 max-w-sm mx-auto leading-relaxed">{OFFICE_NOTE_FULL}</p>
+          </div>
+        ) : (
+          <>
+            <h2 className="font-display font-bold text-xl text-teal-dark mb-1">Know your score? Tell us.</h2>
+            <p className="text-xs text-ink/60 mb-5">
+              Enter your CIBIL score if you know it, and your number — your advisor calls with every loan
+              option it qualifies you for. No bureau pull, no waiting on an API.
+            </p>
+            <form onSubmit={handleQuickSubmit} className="space-y-4">
+              <div className="grid sm:grid-cols-3 gap-4">
+                <Field label="Full Name" required>
+                  <input
+                    required
+                    value={quickForm.name}
+                    onChange={(e) => setQuickForm({ ...quickForm, name: e.target.value })}
+                    placeholder="e.g. Rajesh Sharma"
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="Mobile Number" required>
+                  <input
+                    required
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={quickForm.phone}
+                    onChange={(e) => setQuickForm({ ...quickForm, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                    placeholder="98290XXXXX"
+                    className={inputClass}
+                  />
+                  {quickForm.phone.length > 0 && !quickPhoneValid && (
+                    <p className="text-[11px] text-warn mt-1">Enter a valid 10-digit mobile number.</p>
+                  )}
+                </Field>
+                <Field label="Your CIBIL Score" hint="If known — optional">
+                  <input
+                    type="number"
+                    min={300}
+                    max={900}
+                    value={quickForm.score}
+                    onChange={(e) => setQuickForm({ ...quickForm, score: e.target.value })}
+                    placeholder="e.g. 742"
+                    className={inputClass}
+                  />
+                  {quickForm.score && !quickScoreValid && (
+                    <p className="text-[11px] text-warn mt-1">Score should be between 300 and 900.</p>
+                  )}
+                </Field>
+              </div>
+              <PreferredCallTimeField day={quickCallDay} band={quickCallBand} onDayChange={setQuickCallDay} onBandChange={setQuickCallBand} />
+              {quickError && <p className="text-xs text-warn text-center">{quickError}</p>}
+              <PrimaryButton
+                type="submit"
+                full
+                disabled={quickSubmitting || !quickPhoneValid || !quickForm.name || !quickCallBand || !quickScoreValid}
+              >
+                {quickSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
+                  </>
+                ) : (
+                  "Get My Advisor's Options"
+                )}
+              </PrimaryButton>
+              <OfficeNote />
+            </form>
+          </>
+        )}
+      </div>
+
+      {/* Instant bureau-pull flow — fully wired, kept blurred/disabled until
+          the real bureau API integration (currently under negotiation) goes
+          live. Remove this wrapper (and the "Coming Soon" overlay) to
+          reactivate it; nothing else in the form needs to change. */}
+      <div className="relative mb-8">
+        <div aria-hidden="true" className="pointer-events-none select-none blur-[3px] opacity-50 bg-white rounded-2xl border-2 border-teal/15 p-6 sm:p-8">
         {!result ? (
           <>
             <span className="text-[11px] font-bold text-gold-dark uppercase tracking-wide">Step 1 of 2</span>
@@ -192,6 +319,7 @@ export default function CheckScore() {
                   />
                 </Field>
               </div>
+              <PreferredCallTimeField day={callDay} band={callBand} onDayChange={setCallDay} onBandChange={setCallBand} />
               <label className="flex items-start gap-2.5 text-[11px] text-ink/60 leading-relaxed">
                 <input
                   type="checkbox"
@@ -209,6 +337,7 @@ export default function CheckScore() {
               <p className="flex items-center gap-1.5 text-[11px] text-ink/50 justify-center">
                 <ShieldCheck className="w-3.5 h-3.5 text-teal" /> 256-bit secure · soft inquiry only
               </p>
+              <OfficeNote />
             </form>
           </>
         ) : (
@@ -238,9 +367,24 @@ export default function CheckScore() {
                 <PrimaryButton to="/apply" className="text-xs">Apply Now</PrimaryButton>
                 <SecondaryButton to="/credit-score/improve" className="text-xs">Improve My Score</SecondaryButton>
               </div>
+              <p className="text-[11px] text-ink/45 mt-4 leading-relaxed">{OFFICE_NOTE_FULL}</p>
             </div>
           </div>
         )}
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center p-6">
+          <div className="bg-white/95 border-2 border-gold/50 rounded-2xl px-6 py-5 text-center shadow-raised max-w-sm">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-gold-dark uppercase tracking-wide bg-gold/15 px-2.5 py-1 rounded-full">
+              <Rocket className="w-3 h-3" /> Coming Soon
+            </span>
+            <h3 className="mt-3 font-display font-bold text-teal-dark text-lg">Instant Bureau Pull — Warming Up</h3>
+            <p className="mt-2 text-xs text-ink/60 leading-relaxed">
+              Our systems and the credit bureaus are still exchanging paperwork — even robots need NDAs.
+              Until the ink dries, pop your score in above and a real advisor takes it from here, personally.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-teal/12 p-6 sm:p-8">

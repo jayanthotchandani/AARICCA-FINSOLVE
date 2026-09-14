@@ -13,7 +13,7 @@ export const LOAN_TYPES = [
     title: "Personal Loan",
     icon: Wallet,
     tagline: "Instant liquidity for medical needs, travel, weddings, or debt consolidation.",
-    amount: "Up to ₹40 Lakhs",
+    amount: "Up to ₹50 Lakhs",
     rateFloor: 9.99,
     rateCeil: 15.99,
     tenure: "1–5 Years",
@@ -45,7 +45,7 @@ export const LOAN_TYPES = [
     title: "Business Loan",
     icon: Briefcase,
     tagline: "Fuel working capital, purchase machinery, and scale your daily operations.",
-    amount: "Up to ₹75 Lakhs",
+    amount: "Up to ₹50 Lakhs",
     rateFloor: 8.45,
     rateCeil: 17.5,
     tenure: "1–7 Years",
@@ -339,7 +339,7 @@ export const FAQS = [
   {
     category: "General",
     q: "What is Aaricca Finsales?",
-    a: "Aaricca Finsales is an RBI-registered multi-bank loan distribution partner headquartered in Gurugram, Haryana. We partner with 140+ leading banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
+    a: "Aaricca Finsales is an RBI-registered multi-bank loan distribution partner headquartered at our Delhi-NCR (Gurugram, Haryana) head office. We partner with 140+ leading banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
   },
   {
     category: "General",
@@ -377,6 +377,28 @@ export const FAQS = [
     a: "Your credit score, monthly income, debt-to-income ratio, employment stability, and loan category all factor in. We match your profile to the lowest available rate across our network of 140+ partner banks and NBFCs.",
   },
 ];
+
+// Broad time-of-day bands offered on every lead form's "when should our
+// advisor call you?" field — deliberately coarse (not an exact time picker)
+// since the promise is a call sometime within 24 hours around this window,
+// not an appointment slot.
+// startHour/endHour (24-hr, local time) let the "Today" option gray out
+// bands that have already gone by — e.g. it's pointless to offer a
+// "Morning" callback for today once it's already 2 PM.
+export const CALL_TIME_BANDS = [
+  { key: "morning", label: "Morning", hint: "9 AM – 12 PM", startHour: 9, endHour: 12 },
+  { key: "afternoon", label: "Afternoon", hint: "12 – 4 PM", startHour: 12, endHour: 16 },
+  { key: "evening", label: "Evening", hint: "4 – 7 PM", startHour: 16, endHour: 19 },
+];
+
+// Single-office reassurance copy shown on every lead form: a short version
+// near the submit button (sets expectations before they commit) and a
+// fuller version on the post-submission confirmation screen.
+export const OFFICE_NOTE_SHORT =
+  "We work from a single Delhi-NCR head office — no branches, so there's no runaround.";
+export const OFFICE_NOTE_FULL =
+  "We operate from one dedicated Delhi-NCR head office, not a branch network — so your application gets full attention from a single expert team, start to finish.";
+export const WORKING_HOURS_NOTE = "Advisor working hours: 9 AM – 7 PM, every day.";
 
 export const SCORE_TIERS = [
   { range: "750–900", label: "Excellent", note: "Prime rates & instant sanctions across all 140+ partner banks.", tone: "excellent" },

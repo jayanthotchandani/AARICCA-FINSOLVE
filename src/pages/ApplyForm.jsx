@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { CheckCircle2, MessageCircle, Lock, ShieldCheck, BadgeCheck, Loader2 } from "lucide-react";
-import { LOAN_TYPES } from "../data";
-import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass } from "../components/ui";
+import { LOAN_TYPES, OFFICE_NOTE_FULL } from "../data";
+import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass, PreferredCallTimeField, formatCallbackWindow, OfficeNote } from "../components/ui";
 import { submitLead } from "../api";
 
 function useCountdown(startSeconds) {
@@ -22,6 +22,8 @@ export default function ApplyForm() {
   const defaultLoan = LOAN_TYPES.find((l) => l.id === params.get("loan"))?.title || "Personal Loan";
   const [form, setForm] = useState({ name: "", phone: "", loanType: defaultLoan, amount: "" });
   const phoneValid = /^\d{10}$/.test(form.phone);
+  const [callDay, setCallDay] = useState("Today");
+  const [callBand, setCallBand] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -39,6 +41,7 @@ export default function ApplyForm() {
           Thank you, {form.name || "there"}. Your application is in our queue.
         </p>
         <p className="mt-1 text-xs font-semibold text-ink/50">Ref ID: {refId.current}</p>
+        <p className="mt-3 text-xs text-ink/50 max-w-sm mx-auto leading-relaxed">{OFFICE_NOTE_FULL}</p>
 
         <div className="mt-6 bg-teal-dark text-white rounded-2xl py-5">
           <p className="text-[11px] uppercase tracking-wide text-gold font-semibold">Advisor Callback In</p>
@@ -95,6 +98,7 @@ export default function ApplyForm() {
                 phone: form.phone,
                 loanType: form.loanType,
                 amount: form.amount,
+                details: { preferredCallTime: formatCallbackWindow(callDay, callBand) },
               });
               setSubmitted(true);
             } catch (err) {
@@ -150,8 +154,9 @@ export default function ApplyForm() {
               className={inputClass}
             />
           </Field>
+          <PreferredCallTimeField day={callDay} band={callBand} onDayChange={setCallDay} onBandChange={setCallBand} />
           {error && <p className="text-xs text-warn text-center">{error}</p>}
-          <PrimaryButton type="submit" full disabled={submitting || !phoneValid}>
+          <PrimaryButton type="submit" full disabled={submitting || !phoneValid || !callBand}>
             {submitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
@@ -160,6 +165,7 @@ export default function ApplyForm() {
               "Get My Instant Approval"
             )}
           </PrimaryButton>
+          <OfficeNote />
         </form>
         <p className="mt-4 text-[11px] text-ink/45 text-center">
           Everything else — income, employment, existing debts — is asked personally by your advisor on
