@@ -4,14 +4,36 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Aaricca Finsales — compare rates across 40+ banks and NBFCs, check your credit score, and get a callback from a real advisor within 30 minutes. Credit, simplified." />
+    <meta name="robots" content="index, follow" />
+    <!--
+      description, canonical, og:*, twitter:* are intentionally NOT hardcoded here —
+      every route sets them via <Seo> (src/components/Seo.jsx / react-helmet-async).
+      This fallback title is only what a pre-JS crawler sees on first fetch.
+    -->
     <title>Aaricca Finsales | Credit Simplified</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Aaricca Finsales",
+        "alternateName": "Aaricca",
+        "url": "https://aaricca.com/",
+        "logo": "https://aaricca.com/logo.png",
+        "description": "Aaricca Finsales is a multi-bank loan distribution partner in India, helping customers compare and secure Personal, Business, Home, and other loans across 140+ scheduled banks and NBFCs.",
+        "email": "sales@aaricca.com",
+        "areaServed": "IN",
+        "sameAs": [
+          "https://www.instagram.com/aaricca_/"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

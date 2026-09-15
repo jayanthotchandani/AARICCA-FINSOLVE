@@ -4,6 +4,7 @@ import { ChevronDown, Check, CheckCircle2, Loader2, FileText } from "lucide-reac
 import { LOAN_TYPES, BANKS_BY_LOAN, OFFICE_NOTE_FULL } from "../data";
 import { BackLink, PrimaryButton, Field, inputClass, PreferredCallTimeField, formatCallbackWindow, OfficeNote } from "../components/ui";
 import { submitLead, getRates } from "../api";
+import Seo from "../components/Seo";
 
 function formatINR(n) {
   return "₹" + Math.round(n).toLocaleString("en-IN");
@@ -89,6 +90,11 @@ export default function LoanProductPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title={`${loan.title} — ${loan.amount} at ${loan.rateFloor}% p.a.`}
+        description={`${loan.tagline} Compare ${loan.title.toLowerCase()} offers from 140+ banks and NBFCs, rates from ${loan.rateFloor}% p.a., approval in ${loan.approvalTime}.`}
+        path={`/loans/${loan.id}`}
+      />
       <BackLink />
 
       <div className="max-w-2xl mx-auto text-center mb-10">

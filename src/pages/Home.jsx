@@ -7,6 +7,7 @@ import ScoreGauge, { tierForScore } from "../components/ScoreGauge";
 import ProcessPath from "../components/ProcessPath";
 import Reveal from "../components/Reveal";
 import { getRates } from "../api";
+import Seo from "../components/Seo";
 
 const BENCHMARK_LOAN_IDS = ["personal", "home", "business", "lap", "education"];
 const SPEED_BY_LOAN_ID = {
@@ -148,6 +149,11 @@ export default function Home() {
 
   return (
     <div>
+      <Seo
+        title="Compare Loan Rates from 140+ Banks & NBFCs"
+        description="Aaricca Finsales — compare rates across 140+ banks and NBFCs, check your credit score, and get a callback from a real advisor within 30 minutes. Credit, simplified."
+        path="/"
+      />
       {/* Hero */}
       <section className="pt-8 pb-16 sm:pt-20 sm:pb-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 grid lg:grid-cols-12 gap-12 items-center">

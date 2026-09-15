@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { BackLink, PrimaryButton } from "../components/ui";
+import Seo from "../components/Seo";
 
 const QUICK_WINS = ["Pay off credit card balances (utilization under 30%)", "Check your CIBIL report for errors", "Set up payment reminders / auto-pay"];
 const MEDIUM_TERM = ["Avoid applying for new credit", "Keep old accounts open", "Consolidate high-interest debt"];
@@ -16,6 +17,11 @@ const TIMELINE = [
 export default function ImproveScore() {
   return (
     <div className="max-w-3xl mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title="How to Improve Your Credit Score"
+        description="Practical tips to improve your CIBIL credit score faster — quick wins, medium-term habits, and common mistakes to avoid."
+        path="/credit-score/improve"
+      />
       <BackLink />
       <div className="text-center mb-10">
         <h1 className="font-display font-bold text-h1-sm sm:text-h1 text-teal-dark">Improve Your Credit Score</h1>

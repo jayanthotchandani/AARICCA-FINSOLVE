@@ -6,6 +6,7 @@ import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass, PreferredC
 import ScoreGauge, { tierForScore } from "../components/ScoreGauge";
 import OtpModal from "../components/OtpModal";
 import { submitLead, requestCreditScoreOtp, resendCreditScoreOtp, verifyCreditScoreOtp } from "../api";
+import Seo from "../components/Seo";
 
 const PAN_RE = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 
@@ -138,6 +139,11 @@ export default function CheckScore() {
 
   return (
     <div className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title="Check Your Credit Score Free"
+        description="Check your CIBIL credit score for free in minutes with Aaricca. See your score, understand your loan eligibility, and get personalised offers."
+        path="/credit-score/check"
+      />
       <BackLink />
       <div className="max-w-2xl mx-auto text-center mb-10">
         <h1 className="font-display font-bold text-h1-sm sm:text-h1 text-teal-dark">Free Credit Score Check &amp; Advisory</h1>

@@ -4,6 +4,7 @@ import { CheckCircle2, MessageCircle, Lock, ShieldCheck, BadgeCheck, Loader2 } f
 import { LOAN_TYPES, OFFICE_NOTE_FULL } from "../data";
 import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass, PreferredCallTimeField, formatCallbackWindow, OfficeNote } from "../components/ui";
 import { submitLead } from "../api";
+import Seo from "../components/Seo";
 
 function useCountdown(startSeconds) {
   const [seconds, setSeconds] = useState(startSeconds);
@@ -74,6 +75,11 @@ export default function ApplyForm() {
 
   return (
     <div className="max-w-lg mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title="Apply for a Loan"
+        description="Apply for your loan with Aaricca — quick form, advisor callback within 30 minutes, and offers from 140+ banks and NBFCs."
+        path="/apply"
+      />
       <BackLink />
       <div className="text-center mb-8">
         <h1 className="font-display font-bold text-2xl sm:text-3xl text-teal-dark">Get My Instant Approval</h1>

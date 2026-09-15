@@ -5,6 +5,7 @@ import { BackLink, PrimaryButton, Field, inputClass, AccordionPanel, PreferredCa
 import AutoCarousel from "../components/AutoCarousel";
 import { submitLead } from "../api";
 import { OFFICE_NOTE_FULL } from "../data";
+import Seo from "../components/Seo";
 
 const ICONS = [CreditCard, Landmark, ShoppingBag];
 
@@ -100,6 +101,11 @@ export default function DebtConsolidation() {
 
   return (
     <div className="max-w-4xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+      <Seo
+        title="Debt Consolidation Loans"
+        description="Combine multiple credit card and loan debts into one manageable EMI with Aaricca's debt consolidation loans from 140+ banks and NBFCs."
+        path="/debt-consolidation"
+      />
       <BackLink />
 
       <div className="max-w-2xl mx-auto text-center mb-6 sm:mb-10">

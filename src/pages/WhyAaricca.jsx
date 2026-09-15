@@ -4,6 +4,7 @@ import { TESTIMONIALS } from "../data";
 import { BackLink, PrimaryButton, PageHero } from "../components/ui";
 import IndiaMap from "../components/IndiaMap";
 import Reveal from "../components/Reveal";
+import Seo from "../components/Seo";
 
 // Logo files live in public/logos/banks — only partners we have an actual
 // logo asset for appear in the marquee (rather than mixing in text-name
@@ -36,6 +37,11 @@ const PILLARS = [
 export default function WhyAaricca() {
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title="Why Choose Aaricca"
+        description="Why thousands of Indians trust Aaricca Finsales for loans — transparent rates, 140+ bank partners, fast approvals, and dedicated advisor support."
+        path="/why-aaricca"
+      />
       <BackLink />
       <PageHero title="Why choose Aaricca Finsales" subtitle="Connecting Indian borrowers with institutional capital at fair, transparent, and legally vetted terms." />
 

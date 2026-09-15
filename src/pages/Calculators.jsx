@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { LOAN_TYPES } from "../data";
 import { BackLink, PrimaryButton, PageHero } from "../components/ui";
+import Seo from "../components/Seo";
 
 function formatINR(n) {
   return "₹" + Math.round(n).toLocaleString("en-IN");
@@ -24,6 +25,11 @@ export default function Calculators() {
 
   return (
     <div className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title="EMI & Eligibility Calculators"
+        description="Calculate your loan EMI, eligibility, and interest payout instantly with Aaricca's free loan calculators."
+        path="/calculators"
+      />
       <BackLink />
       <PageHero
         title="Loan EMI & amortization calculator"

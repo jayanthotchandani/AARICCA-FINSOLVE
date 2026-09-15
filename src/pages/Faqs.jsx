@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import { FAQS } from "../data";
 import { BackLink, PrimaryButton, PageHero, AccordionPanel } from "../components/ui";
+import Seo from "../components/Seo";
 
 const CATEGORIES = ["All", "General", "Loan Process", "Eligibility", "Rates & Charges"];
 
@@ -23,6 +24,11 @@ export default function Faqs() {
 
   return (
     <div className="max-w-3xl mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title="Frequently Asked Questions"
+        description="Answers to common questions about loans, eligibility, documentation, and the Aaricca loan process."
+        path="/faqs"
+      />
       <BackLink />
       <PageHero title="Frequently asked questions" subtitle="Instant answers on interest rates, eligibility criteria, and regulatory practices." />
 

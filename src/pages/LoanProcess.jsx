@@ -2,6 +2,7 @@ import React from "react";
 import { UserCheck, Scale, FileEdit, Landmark, Percent, ShieldCheck, Headphones } from "lucide-react";
 import { BackLink, PrimaryButton, PageHero } from "../components/ui";
 import ProcessPath from "../components/ProcessPath";
+import Seo from "../components/Seo";
 
 const STEPS = [
   { n: "01", icon: UserCheck, title: "Eligibility", desc: "Tell us your requirement. Two minutes to fill basic details." },
@@ -19,6 +20,11 @@ const ADVANTAGES = [
 export default function LoanProcess() {
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
+      <Seo
+        title="How the Loan Process Works"
+        description="See Aaricca's simple 4-step loan process — from eligibility check to disbursal — with a 90%+ approval success rate across 140+ banks and NBFCs."
+        path="/loan-process"
+      />
       <BackLink />
       <PageHero title={<>Easy. Convenient. <span className="text-gold-dark">Quick.</span></>} subtitle="The simple, four-step route to your loan." />
 
