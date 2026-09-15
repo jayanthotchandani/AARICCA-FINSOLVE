@@ -232,7 +232,7 @@ export default function LoanProductPage() {
           <div className="fade-swap-enter text-center py-6">
             <CheckCircle2 className="w-12 h-12 text-teal mx-auto mb-3" />
             <h3 className="font-display font-semibold text-lg text-teal-dark">You're on the list.</h3>
-            <p className="text-sm text-ink/65 mt-1">An advisor reviews your profile personally and calls within 30 minutes.</p>
+            <p className="text-sm text-ink/65 mt-1">An advisor reviews your profile personally and calls within 24 hours.</p>
             <p className="text-xs text-ink/50 mt-3 max-w-sm mx-auto leading-relaxed">{OFFICE_NOTE_FULL}</p>
           </div>
         ) : (
@@ -345,7 +345,7 @@ export default function LoanProductPage() {
               <OfficeNote />
               <ul className="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-ink/55 pt-1">
                 <li className="flex items-center gap-1"><Check className="w-3 h-3 text-teal" /> Soft inquiry — no impact to your score</li>
-                <li className="flex items-center gap-1"><Check className="w-3 h-3 text-teal" /> Advisor calls within 30 minutes</li>
+                <li className="flex items-center gap-1"><Check className="w-3 h-3 text-teal" /> Advisor calls within 24 hours</li>
                 <li className="flex items-center gap-1"><Check className="w-3 h-3 text-teal" /> Compare all bank options at once</li>
               </ul>
             </form>

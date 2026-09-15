@@ -1,22 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { CheckCircle2, MessageCircle, Lock, ShieldCheck, BadgeCheck, Loader2 } from "lucide-react";
+import { CheckCircle2, MessageCircle, Lock, ShieldCheck, BadgeCheck, Loader2, PhoneCall, Sparkles } from "lucide-react";
 import { LOAN_TYPES, OFFICE_NOTE_FULL } from "../data";
 import { BackLink, PrimaryButton, SecondaryButton, Field, inputClass, PreferredCallTimeField, formatCallbackWindow, OfficeNote } from "../components/ui";
 import { submitLead } from "../api";
 import Seo from "../components/Seo";
-
-function useCountdown(startSeconds) {
-  const [seconds, setSeconds] = useState(startSeconds);
-  useEffect(() => {
-    if (seconds <= 0) return;
-    const id = setInterval(() => setSeconds((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(id);
-  }, [seconds > 0]); // eslint-disable-line react-hooks/exhaustive-deps
-  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-  const s = (seconds % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
-}
 
 export default function ApplyForm() {
   const [params] = useSearchParams();
@@ -29,7 +17,6 @@ export default function ApplyForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const refId = useRef(`ARC-${Math.floor(100000 + Math.random() * 900000)}`);
-  const countdown = useCountdown(30 * 60);
 
   if (submitted) {
     return (
@@ -44,9 +31,17 @@ export default function ApplyForm() {
         <p className="mt-1 text-xs font-semibold text-ink/50">Ref ID: {refId.current}</p>
         <p className="mt-3 text-xs text-ink/50 max-w-sm mx-auto leading-relaxed">{OFFICE_NOTE_FULL}</p>
 
-        <div className="mt-6 bg-teal-dark text-white rounded-2xl py-5">
-          <p className="text-[11px] uppercase tracking-wide text-gold font-semibold">Advisor Callback In</p>
-          <p className="font-display font-bold text-4xl mt-1 tabular-nums">{countdown}</p>
+        <div className="mt-6 bg-teal-dark text-white rounded-2xl py-6 px-6">
+          <p className="text-[11px] uppercase tracking-wide text-gold font-semibold flex items-center justify-center gap-1.5">
+            <PhoneCall className="w-3.5 h-3.5" /> Your Callback Window
+          </p>
+          <p className="font-display font-bold text-2xl sm:text-3xl mt-1.5">
+            {formatCallbackWindow(callDay, callBand) || "Confirmed shortly"}
+          </p>
+          <p className="mt-2 text-xs text-cream/70 flex items-center justify-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-gold shrink-0" />
+            A senior advisor from our Delhi-NCR head office calls personally — no bots, no hold music.
+          </p>
         </div>
 
         <ul className="mt-6 space-y-2 text-left inline-block">
@@ -77,7 +72,7 @@ export default function ApplyForm() {
     <div className="max-w-lg mx-auto px-5 sm:px-8 py-12">
       <Seo
         title="Apply for a Loan"
-        description="Apply for your loan with Aaricca — quick form, advisor callback within 30 minutes, and offers from 140+ banks and NBFCs."
+        description="Apply for your loan with Aaricca — quick form, advisor callback within 24 hours, and offers from 140+ banks and NBFCs."
         path="/apply"
       />
       <BackLink />

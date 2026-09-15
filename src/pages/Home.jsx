@@ -151,7 +151,7 @@ export default function Home() {
     <div>
       <Seo
         title="Compare Loan Rates from 140+ Banks & NBFCs"
-        description="Aaricca Finsales — compare rates across 140+ banks and NBFCs, check your credit score, and get a callback from a real advisor within 30 minutes. Credit, simplified."
+        description="Aaricca Finsales — compare rates across 140+ banks and NBFCs, check your credit score, and schedule a callback from a real advisor. Credit, simplified."
         path="/"
       />
       {/* Hero */}
@@ -163,7 +163,7 @@ export default function Home() {
             </h1>
             <p className="mt-5 text-base sm:text-lg text-ink/75 leading-relaxed max-w-xl">
               We put 140+ banks and NBFCs in competition for your loan — real bank rates, one application,
-              zero jargon, and a human advisor who calls back in 30 minutes, not a form that goes silent.
+              zero jargon, and a human advisor who calls back at a time you choose, not a form that goes silent.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3.5">
               <PrimaryButton to="/apply">
@@ -391,7 +391,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-6">
             <h2 className="font-display font-bold text-h2 text-white leading-tight">
-              Get your financial helper in 30 minutes
+              Get your financial helper on a call
             </h2>
             <p className="mt-4 text-cream/75 text-sm sm:text-base leading-relaxed">
               Skip the queues. Leave your number and our senior credit advisor at our Delhi-NCR head office will call
@@ -402,7 +402,7 @@ export default function Home() {
                 <ShieldCheck className="w-4 h-4 text-gold" /> RBI Regulated
               </span>
               <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-gold" /> 30-Min Callback
+                <Clock className="w-4 h-4 text-gold" /> Callback Within 24 Hrs
               </span>
               <span className="flex items-center gap-1.5">
                 <Zap className="w-4 h-4 text-gold" /> Zero Fee
@@ -425,7 +425,7 @@ function CallbackForm() {
       <div className="fade-swap-enter bg-white text-ink rounded-2xl p-8 text-center shadow-raised">
         <CheckCircle2 className="w-10 h-10 text-teal mx-auto mb-3" />
         <p className="font-display font-semibold text-teal-dark">Request received.</p>
-        <p className="text-sm text-ink/65 mt-1">Your advisor will call within 30 minutes.</p>
+        <p className="text-sm text-ink/65 mt-1">Your advisor will call within 24 hours.</p>
       </div>
     );
   }

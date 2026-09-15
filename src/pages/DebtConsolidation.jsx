@@ -35,7 +35,7 @@ const HOW_IT_WORKS = [
   { n: 1, title: "Enter every debt you owe", desc: "List each credit card, loan, or EMI card — amount, rate, monthly payment. No limit on how many." },
   { n: 2, title: "Our advisor reviews each one", desc: "A human looks at every debt individually — no auto-scoring or instant math here." },
   { n: 3, title: "We recommend transfer, consolidation, or both", desc: "Rate too high on one loan? We move it. Two loans work better as one? We combine them." },
-  { n: 4, title: "You get one clear plan", desc: "Our advisor calls within 30 minutes to walk through exactly what we recommend and why." },
+  { n: 4, title: "You get one clear plan", desc: "Our advisor calls within 24 hours to walk through exactly what we recommend and why." },
 ];
 
 const FAQ_ITEMS = [
@@ -301,7 +301,7 @@ export default function DebtConsolidation() {
           <div className="fade-swap-enter text-center py-6">
             <CheckCircle2 className="w-12 h-12 text-teal mx-auto mb-3" />
             <h3 className="font-display font-semibold text-lg text-teal-dark">Your debts are with our advisor.</h3>
-            <p className="text-sm text-ink/65 mt-1">We'll call within 30 minutes with a specific recommendation.</p>
+            <p className="text-sm text-ink/65 mt-1">We'll call within 24 hours with a specific recommendation.</p>
             <p className="text-xs text-ink/50 mt-3 max-w-sm mx-auto leading-relaxed">{OFFICE_NOTE_FULL}</p>
           </div>
         ) : (
