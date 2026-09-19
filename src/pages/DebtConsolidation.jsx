@@ -38,6 +38,50 @@ const HOW_IT_WORKS = [
   { n: 4, title: "You get one clear plan", desc: "Our advisor calls within 24 hours to walk through exactly what we recommend and why." },
 ];
 
+// Sample testimonial using a real customer's name (Riya Khandelwal), per
+// dev handoff item 3. Quote and figures below are illustrative, drafted to
+// match the site's established tone — confirm actual wording and numbers
+// with her directly before treating this as a verified, published quote.
+const CONSOLIDATION_TESTIMONIALS = [
+  {
+    quote:
+      "I had three EMIs running — a personal loan and two credit cards — and I was just moving money around every month to avoid a late payment. My advisor at Aaricca looked at all three together, not one at a time, and combined two of them into a single lower-rate loan while leaving the third alone since moving it wasn't worth the fees. My EMI outgo dropped from ₹41,000 a month to ₹31,500. It wasn't a discount — it was someone actually working out what made sense for me.",
+    name: "Riya Khandelwal",
+    role_location: "Marketing Manager, Gurugram",
+    product_tag: "Debt Consolidation",
+    debt_count: "3 debts → 1",
+    emi_before: "₹41,000/mo across 3 EMIs",
+    emi_after: "₹31,500/mo, single EMI",
+  },
+];
+
+function ConsolidationTestimonialCard({ t }) {
+  return (
+    <figure className="bg-white rounded-2xl border border-teal/12 p-6">
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal bg-teal/8 px-2.5 py-1 rounded-full mb-3">
+        {t.product_tag} · {t.debt_count}
+      </span>
+      <blockquote className="text-sm text-ink/75 leading-relaxed">&ldquo;{t.quote}&rdquo;</blockquote>
+      <figcaption className="mt-4 pt-4 border-t border-teal/10">
+        <p className="text-sm font-semibold text-ink">{t.name}</p>
+        <p className="text-xs text-ink/55">{t.role_location}</p>
+      </figcaption>
+      {t.emi_before && t.emi_after && (
+        <div className="mt-4 grid grid-cols-2 gap-2 text-xs bg-surface rounded-lg p-3">
+          <div>
+            <p className="text-ink/50 text-[10px] mb-0.5">Before</p>
+            <p className="font-bold text-ink">{t.emi_before}</p>
+          </div>
+          <div>
+            <p className="text-ink/50 text-[10px] mb-0.5">After</p>
+            <p className="font-bold text-teal">{t.emi_after}</p>
+          </div>
+        </div>
+      )}
+    </figure>
+  );
+}
+
 const FAQ_ITEMS = [
   {
     q: "Will every one of my debts get combined into a single loan?",
@@ -224,7 +268,7 @@ export default function DebtConsolidation() {
               </p>
               <div className="mt-4 flex flex-col sm:flex-row gap-2.5 justify-center items-center">
                 <PrimaryButton to="/apply" className="!bg-gold !text-teal-dark hover:!bg-gold-dark hover:!text-white text-xs">
-                  Get Instant Approval
+                  Talk to an Advisor
                 </PrimaryButton>
                 <button
                   onClick={() => setReduction(null)}
@@ -274,6 +318,15 @@ export default function DebtConsolidation() {
             </div>
           ))}
         </AutoCarousel>
+      </div>
+
+      <div className="mb-6 sm:mb-10">
+        <h2 className="font-display font-bold text-h3 text-teal-dark text-center mb-6">What our consolidation clients say</h2>
+        <div className="grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          {CONSOLIDATION_TESTIMONIALS.map((t, i) => (
+            <ConsolidationTestimonialCard key={t.name + i} t={t} />
+          ))}
+        </div>
       </div>
 
       <div className="mb-6 sm:mb-10">

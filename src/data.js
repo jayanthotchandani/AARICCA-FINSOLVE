@@ -14,7 +14,7 @@ export const LOAN_TYPES = [
     icon: Wallet,
     tagline: "Instant liquidity for medical needs, travel, weddings, or debt consolidation.",
     amount: "Up to ₹50 Lakhs",
-    rateFloor: 9.99,
+    rateFloor: 8.75,
     rateCeil: 15.99,
     tenure: "1–5 Years",
     approvalTime: "24–48 Hrs",
@@ -46,7 +46,7 @@ export const LOAN_TYPES = [
     icon: Briefcase,
     tagline: "Fuel working capital, purchase machinery, and scale your daily operations.",
     amount: "Up to ₹50 Lakhs",
-    rateFloor: 8.45,
+    rateFloor: 8.15,
     rateCeil: 17.5,
     tenure: "1–7 Years",
     approvalTime: "48–72 Hrs",
@@ -82,7 +82,7 @@ export const LOAN_TYPES = [
     icon: HomeIcon,
     tagline: "Lowest rates for purchasing, constructing, or transferring your home loan.",
     amount: "Up to ₹5 Crores",
-    rateFloor: 7.2,
+    rateFloor: 7.0,
     rateCeil: 9.75,
     tenure: "Up to 30 Years",
     approvalTime: "3–5 Working Days",
@@ -119,7 +119,7 @@ export const LOAN_TYPES = [
     icon: Building2,
     tagline: "Unlock high-value liquidity against your residential or commercial property.",
     amount: "Up to ₹10 Crores",
-    rateFloor: 8.45,
+    rateFloor: 8.25,
     rateCeil: 12.5,
     tenure: "Up to 15 Years",
     approvalTime: "5–7 Working Days",
@@ -155,7 +155,7 @@ export const LOAN_TYPES = [
     icon: GraduationCap,
     tagline: "Fund premier domestic and international higher studies with moratorium support.",
     amount: "Up to ₹1.5 Crores",
-    rateFloor: 8.05,
+    rateFloor: 6.85,
     rateCeil: 13.0,
     tenure: "Up to 15 Years",
     approvalTime: "3–5 Working Days",
@@ -191,7 +191,7 @@ export const LOAN_TYPES = [
     icon: Landmark,
     tagline: "Specialized credit lines for manufacturing units, plant setup, and traders.",
     amount: "Up to ₹2 Crores",
-    rateFloor: 10.25,
+    rateFloor: 7.9,
     rateCeil: 15.0,
     tenure: "Up to 7 Years",
     approvalTime: "48–96 Hrs",
@@ -220,89 +220,89 @@ export const LOAN_TYPES = [
   },
 ];
 
-// Researched starting rates, current as of Sept 2026. Update this list
-// whenever rates change — it drives both the homepage "Live Bank Rate
-// Benchmark" panel and each product page's bank selector.
-//
-// Note: Education Loan intentionally lists only 4 lenders — Bajaj Finserv,
-// Tata Capital, Kotak Mahindra, and IDFC FIRST don't run mainstream retail
-// education loan products the way the big public banks do, so no rate is
-// listed for them rather than guessing one.
-export const RATE_BENCHMARK_UPDATED_AT = "2026-09-08";
+// Researched starting rates, current as of Sept 2026 — sourced from public
+// bank rate pages and aggregators (BankBazaar, Wishfin, CreditMantri, etc.),
+// favoring whichever 10 lenders (5+ for Education, where fewer mainstream
+// retail lenders publish a rate) currently publish the lowest starting rate
+// per category, PSU and private alike. Update this list whenever rates
+// change — it drives both the homepage "Live Bank Rate Benchmark" panel and
+// each product page's bank selector.
+export const RATE_BENCHMARK_UPDATED_AT = "2026-09-19";
 
 export const BANKS_BY_LOAN = {
   personal: [
-    { name: "IDFC FIRST Bank", rate: 9.99 },
+    { name: "Axis Bank", rate: 8.75 },
+    { name: "Bank of Maharashtra", rate: 8.75 },
     { name: "HDFC Bank", rate: 9.99 },
     { name: "ICICI Bank", rate: 9.99 },
-    { name: "Axis Bank", rate: 9.99 },
-    { name: "Bajaj Finserv", rate: 10.0 },
+    { name: "IDFC FIRST Bank", rate: 9.99 },
     { name: "State Bank of India", rate: 10.0 },
     { name: "Bank of Baroda", rate: 10.15 },
     { name: "Punjab National Bank", rate: 10.25 },
-    { name: "Tata Capital", rate: 10.99 },
-    { name: "Kotak Mahindra Bank", rate: 10.99 },
+    { name: "Bank of India", rate: 10.85 },
+    { name: "Yes Bank", rate: 10.85 },
   ],
   home: [
-    { name: "HDFC Bank", rate: 7.2 },
+    { name: "Bank of Maharashtra", rate: 7.0 },
+    { name: "Central Bank of India", rate: 7.0 },
+    { name: "Bank of India", rate: 7.1 },
+    { name: "Canara Bank", rate: 7.15 },
     { name: "Bank of Baroda", rate: 7.2 },
     { name: "State Bank of India", rate: 7.25 },
-    { name: "Bajaj Finserv", rate: 7.4 },
+    { name: "Punjab National Bank", rate: 7.4 },
+    { name: "UCO Bank", rate: 7.5 },
+    { name: "ICICI Bank", rate: 7.55 },
     { name: "Kotak Mahindra Bank", rate: 7.6 },
-    { name: "ICICI Bank", rate: 7.65 },
-    { name: "Punjab National Bank", rate: 8.15 },
-    { name: "Axis Bank", rate: 8.35 },
-    { name: "Tata Capital", rate: 8.45 },
-    { name: "IDFC FIRST Bank", rate: 8.85 },
   ],
   business: [
-    { name: "State Bank of India", rate: 8.5 },
-    { name: "Kotak Mahindra Bank", rate: 10.0 },
-    { name: "ICICI Bank", rate: 10.25 },
-    { name: "Punjab National Bank", rate: 10.35 },
-    { name: "HDFC Bank", rate: 10.75 },
-    { name: "Axis Bank", rate: 11.49 },
-    { name: "Tata Capital", rate: 8.45 },
-    { name: "Bajaj Finserv", rate: 14.0 },
+    { name: "Bank of Baroda", rate: 8.15 },
+    { name: "Indian Bank", rate: 8.15 },
+    { name: "Punjab National Bank", rate: 8.25 },
+    { name: "State Bank of India", rate: 9.1 },
+    { name: "Canara Bank", rate: 9.25 },
+    { name: "Bank of India", rate: 9.35 },
+    { name: "Union Bank of India", rate: 9.4 },
+    { name: "Kotak Mahindra Bank", rate: 9.5 },
+    { name: "Shriram Finance", rate: 10.0 },
+    { name: "South Indian Bank", rate: 10.65 },
   ],
   lap: [
-    { name: "Tata Capital", rate: 8.45 },
-    { name: "IDFC FIRST Bank", rate: 8.75 },
+    { name: "Canara Bank", rate: 8.25 },
     { name: "State Bank of India", rate: 8.95 },
-    { name: "HDFC Bank", rate: 9.5 },
-    { name: "Axis Bank", rate: 9.5 },
-    { name: "Kotak Mahindra Bank", rate: 9.5 },
-    { name: "ICICI Bank", rate: 9.75 },
+    { name: "HDFC Bank", rate: 9.0 },
+    { name: "IDFC FIRST Bank", rate: 9.0 },
+    { name: "Punjab National Bank", rate: 9.05 },
+    { name: "Axis Bank", rate: 9.25 },
+    { name: "Kotak Mahindra Bank", rate: 9.25 },
+    { name: "Bank of Baroda", rate: 9.35 },
+    { name: "Tata Capital", rate: 10.1 },
+    { name: "ICICI Bank", rate: 10.6 },
   ],
   education: [
-    { name: "State Bank of India", rate: 8.05 },
-    { name: "HDFC Bank", rate: 9.5 },
-    { name: "ICICI Bank", rate: 9.5 },
-    { name: "Axis Bank", rate: 10.5 },
+    { name: "Bank of Maharashtra", rate: 6.85 },
+    { name: "UCO Bank", rate: 6.9 },
+    { name: "IDBI Bank", rate: 6.95 },
+    { name: "Bank of India", rate: 7.0 },
+    { name: "Canara Bank", rate: 7.25 },
+    { name: "Punjab National Bank", rate: 7.5 },
+    { name: "Axis Bank", rate: 8.0 },
+    { name: "Bank of Baroda", rate: 8.15 },
+    { name: "ICICI Bank", rate: 8.5 },
+    { name: "State Bank of India", rate: 9.4 },
+  ],
+  msme: [
+    { name: "Bank of Baroda", rate: 7.9 },
+    { name: "State Bank of India", rate: 8.0 },
+    { name: "Punjab National Bank", rate: 8.25 },
+    { name: "Canara Bank", rate: 8.45 },
+    { name: "Bank of India", rate: 8.6 },
+    { name: "Union Bank of India", rate: 8.75 },
+    { name: "Indian Bank", rate: 8.9 },
+    { name: "Kotak Mahindra Bank", rate: 9.5 },
+    { name: "HDFC Bank", rate: 10.25 },
+    { name: "ICICI Bank", rate: 10.78 },
   ],
 };
-function bankSetFor(loan) {
-  const spread = loan.rateCeil - loan.rateFloor;
-  const names = [
-    "HDFC Bank",
-    "ICICI Bank",
-    "State Bank of India",
-    "Axis Bank",
-    "Kotak Mahindra Bank",
-    "Bank of Baroda",
-    "Punjab National Bank",
-    "Tata Capital",
-    "Bajaj Finserv",
-    "IDFC FIRST Bank",
-  ];
-  return names.map((name, i) => ({
-    name,
-    rate: Math.round((loan.rateFloor + (spread * i) / (names.length - 1)) * 100) / 100,
-  }));
-}
-LOAN_TYPES.forEach((loan) => {
-  if (!BANKS_BY_LOAN[loan.id]) BANKS_BY_LOAN[loan.id] = bankSetFor(loan);
-});
 
 export const BANK_PARTNERS = [
   "HDFC Bank", "ICICI Bank", "State Bank of India", "Axis Bank",
@@ -339,7 +339,7 @@ export const FAQS = [
   {
     category: "General",
     q: "What is Aaricca Finsales?",
-    a: "Aaricca Finsales is an RBI-registered multi-bank loan distribution partner headquartered at our Delhi-NCR (Gurugram, Haryana) head office. We partner with 140+ leading banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
+    a: "Aaricca Finsales is a multi-bank loan distribution partner headquartered at our Delhi-NCR (Gurugram, Haryana) head office. Loans sanctioned by RBI-regulated banks & NBFCs — we partner with 140+ leading banks and NBFCs across India to negotiate the lowest interest rates and fastest sanctions for retail and commercial borrowers.",
   },
   {
     category: "General",

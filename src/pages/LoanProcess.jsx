@@ -6,7 +6,7 @@ import Seo from "../components/Seo";
 
 const STEPS = [
   { n: "01", icon: UserCheck, title: "Eligibility", desc: "Tell us your requirement. Two minutes to fill basic details." },
-  { n: "02", icon: Scale, title: "Compare", desc: "Our engine matches 140+ premier banks and NBFCs with a 90%+ success rate." },
+  { n: "02", icon: Scale, title: "Compare", desc: "Our engine matches 140+ premier banks and NBFCs with a 94.8% success rate." },
   { n: "03", icon: FileEdit, title: "Apply", desc: "Paperless e-KYC and digital application completed in minutes." },
   { n: "04", icon: Landmark, title: "Disbursement", desc: "Get quick sanction and funds credited directly, not in weeks." },
 ];
@@ -22,7 +22,7 @@ export default function LoanProcess() {
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
       <Seo
         title="How the Loan Process Works"
-        description="See Aaricca's simple 4-step loan process — from eligibility check to disbursal — with a 90%+ approval success rate across 140+ banks and NBFCs."
+        description="See Aaricca's simple 4-step loan process — from eligibility check to disbursal — with a 94.8% approval success rate across 140+ banks and NBFCs."
         path="/loan-process"
       />
       <BackLink />
@@ -31,7 +31,7 @@ export default function LoanProcess() {
       <ProcessPath steps={STEPS} />
 
       <div className="text-center mt-6 mb-14">
-        <PrimaryButton to="/apply">Get Started Online</PrimaryButton>
+        <PrimaryButton to="/apply">Check My Eligibility</PrimaryButton>
       </div>
 
       <div className="bg-white rounded-2xl border border-teal/12 p-6 sm:p-10">

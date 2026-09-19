@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
-import { LOAN_TYPES } from "../data";
+import React, { useState, useMemo, useEffect } from "react";
+import { LOAN_TYPES, BANKS_BY_LOAN } from "../data";
 import { BackLink, PrimaryButton, PageHero } from "../components/ui";
+import { getRates } from "../api";
 import Seo from "../components/Seo";
 
 function formatINR(n) {
@@ -11,8 +12,37 @@ export default function Calculators() {
   const [loanId, setLoanId] = useState("personal");
   const loan = LOAN_TYPES.find((l) => l.id === loanId);
   const [amount, setAmount] = useState(1500000);
-  const [rate, setRate] = useState(11);
+  const [rate, setRate] = useState(loan.rateFloor);
   const [years, setYears] = useState(5);
+
+  // Static data.js is the instant-paint fallback; the live fetch then swaps
+  // in whatever the internal admin tool's Bank Rates tab currently has — same
+  // source that powers the homepage ticker and every /loans/:id page.
+  const [banksByLoan, setBanksByLoan] = useState(BANKS_BY_LOAN);
+
+  useEffect(() => {
+    getRates()
+      .then((byLoan) => {
+        const normalized = {};
+        for (const [id, rows] of Object.entries(byLoan)) {
+          normalized[id] = rows.map((r) => ({ name: r.bank_name, rate: r.rate }));
+        }
+        setBanksByLoan(normalized);
+      })
+      .catch(() => {
+        // Static fallback already rendering.
+      });
+  }, []);
+
+  // Each category re-anchors the slider to its real lowest current rate
+  // (matching its dedicated /loans/:id page) whenever the category changes
+  // or a live rate update comes in — instead of leaving it on whatever the
+  // previous category left it at, or a value that's since gone stale.
+  useEffect(() => {
+    const rows = banksByLoan[loanId];
+    const lowest = rows && rows.length ? Math.min(...rows.map((r) => r.rate)) : loan.rateFloor;
+    setRate(lowest);
+  }, [loanId, banksByLoan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const result = useMemo(() => {
     const P = amount;
@@ -55,7 +85,7 @@ export default function Calculators() {
       <div className="bg-white rounded-2xl border-2 border-teal/12 p-6 sm:p-8 grid lg:grid-cols-2 gap-8">
         <div className="space-y-6">
           <Slider label="Loan Amount" value={amount} display={formatINR(amount)} min={50000} max={20000000} step={50000} onChange={setAmount} />
-          <Slider label="Annual Interest Rate" value={rate} display={`${rate}%`} min={7.5} max={22} step={0.1} onChange={setRate} />
+          <Slider label="Annual Interest Rate" value={rate} display={`${rate}%`} min={7} max={22} step={0.1} onChange={setRate} />
           <Slider label="Loan Tenure" value={years} display={`${years} Years`} min={1} max={30} step={1} onChange={setYears} />
         </div>
         <div className="bg-teal-dark text-white rounded-2xl p-6 flex flex-col justify-between">

@@ -11,6 +11,8 @@ import Calculators from "./pages/Calculators.jsx";
 import LoanProcess from "./pages/LoanProcess.jsx";
 import WhyAaricca from "./pages/WhyAaricca.jsx";
 import Faqs from "./pages/Faqs.jsx";
+import Terms from "./pages/Terms.jsx";
+import Privacy from "./pages/Privacy.jsx";
 import LeadQueue from "./pages/LeadQueue.jsx";
 
 export default function App() {
@@ -28,6 +30,8 @@ export default function App() {
         <Route path="/loan-process" element={<LoanProcess />} />
         <Route path="/why-aaricca" element={<WhyAaricca />} />
         <Route path="/faqs" element={<Faqs />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

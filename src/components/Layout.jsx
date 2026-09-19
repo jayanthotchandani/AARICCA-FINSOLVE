@@ -183,7 +183,7 @@ export function Header() {
               to="/apply"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-teal text-white text-sm font-semibold hover:bg-teal-dark transition-colors shadow-card"
             >
-              Get Instant Approval
+              Check Eligibility
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -239,7 +239,7 @@ export function Header() {
               to="/apply"
               className="mt-3 flex items-center justify-center gap-2 py-3 rounded-full bg-teal text-white text-sm font-semibold"
             >
-              Get Instant Approval
+              Check Eligibility
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -307,9 +307,8 @@ export function Footer() {
             title="Compliance"
             links={[
               ["FAQs & Help", "/faqs"],
-              ["RBI Fair Practice Code", "/faqs"],
-              ["Privacy Policy", "/faqs"],
-              ["Terms & Conditions", "/faqs"],
+              ["Privacy Policy", "/privacy"],
+              ["Terms & Conditions", "/terms"],
             ]}
           />
         </div>
@@ -317,6 +316,9 @@ export function Footer() {
           <p>© 2026 Aaricca Finsales. All rights reserved. Regulated multi-bank distribution entity.</p>
           <p>Loan sanctions and interest rates are subject to the underwriting guidelines of partner banks and NBFCs.</p>
         </div>
+        <p className="pt-4 text-center text-[11px] text-cream/45 max-w-lg mx-auto leading-relaxed">
+          Aaricca Finsales operates as a corporate DSA (Direct Selling Agent) in partnership with First Advisor.
+        </p>
       </div>
     </footer>
   );

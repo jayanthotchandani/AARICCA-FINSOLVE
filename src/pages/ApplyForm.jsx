@@ -77,7 +77,7 @@ export default function ApplyForm() {
       />
       <BackLink />
       <div className="text-center mb-8">
-        <h1 className="font-display font-bold text-2xl sm:text-3xl text-teal-dark">Get My Instant Approval</h1>
+        <h1 className="font-display font-bold text-2xl sm:text-3xl text-teal-dark">Talk to My Advisor</h1>
         <p className="mt-2 text-sm text-ink/65">Four fields. Everything else, our advisor asks personally on the call.</p>
       </div>
 
@@ -163,7 +163,7 @@ export default function ApplyForm() {
                 <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
               </>
             ) : (
-              "Get My Instant Approval"
+              "Request My Callback"
             )}
           </PrimaryButton>
           <OfficeNote />

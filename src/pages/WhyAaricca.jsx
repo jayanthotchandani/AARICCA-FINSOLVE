@@ -27,7 +27,7 @@ const PARTNER_LOGOS = [
 
 const PILLARS = [
   { icon: Zap, title: "Speed & Express Sanction", desc: "Digital verification pipelines enable pre-approvals in minutes and bank disbursals in 24 hours." },
-  { icon: Percent, title: "Lowest Rate Guarantee", desc: "Simultaneous rate bidding across 140+ banks and NBFCs ensures your optimum borrowing cost." },
+  { icon: Percent, title: "140+ Banks Compete. You Get the Best of It.", desc: "Simultaneous rate bidding across 140+ banks and NBFCs ensures your optimum borrowing cost." },
   { icon: ShieldCheck, title: "Zero Hidden Charges", desc: "No upfront fees. Complete disclosure on bank processing fees, legal charges, and stamp duties." },
   { icon: Headphones, title: "Dedicated Loan Specialist", desc: "A personal credit advisor manages your paperwork, doorstep collection, and bank coordination." },
   { icon: FileText, title: "Paperless Documentation", desc: "Seamless DigiLocker and account-aggregator integrations for instant financial verification." },
@@ -102,12 +102,8 @@ export default function WhyAaricca() {
       </div>
 
       <div className="text-center">
-        <PrimaryButton to="/apply">Start Your Application</PrimaryButton>
+        <PrimaryButton to="/apply">Talk to an Advisor</PrimaryButton>
       </div>
-
-      <p className="text-center text-[11px] text-ink/40 mt-8 max-w-lg mx-auto leading-relaxed">
-        Aaricca Finsales operates as a corporate DSA (Direct Selling Agent) in partnership with First Advisor.
-      </p>
     </div>
   );
 }

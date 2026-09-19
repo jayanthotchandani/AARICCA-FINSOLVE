@@ -85,17 +85,17 @@ function RateRow({ row, offsetMs }) {
       className="flex items-center justify-between p-3 rounded-lg bg-surface hover:bg-teal/5 border border-transparent hover:border-teal/15 transition-[background-color,border-color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group"
       style={justUpdated ? { backgroundColor: "#14544F14", borderColor: "#14544F30" } : undefined}
     >
-      <div>
+      <div className="min-w-0 pe-2">
         <p className="text-sm font-semibold text-ink">{row.label}</p>
         <p className="text-xs text-ink/55">{row.speed}</p>
       </div>
-      <span className="flex flex-col items-end">
+      <span className="flex flex-col items-end shrink-0">
         <span
           key={prefersReducedMotion ? "static" : bank.name}
-          className="flex items-center gap-1 text-sm font-extrabold text-teal group-hover:text-teal-dark rate-pop-in"
+          className="flex items-center gap-1 text-sm font-extrabold text-teal group-hover:text-teal-dark rate-pop-in whitespace-nowrap"
         >
           {bank.rate.toFixed(2)}% onwards
-          <ArrowUpRight className="w-3.5 h-3.5" />
+          <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
         </span>
         <span
           key={(prefersReducedMotion ? "static" : bank.name) + "-label"}
@@ -167,7 +167,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3.5">
               <PrimaryButton to="/apply">
-                <ArrowCTA>Get Instant Approval</ArrowCTA>
+                <ArrowCTA>Check My Eligibility</ArrowCTA>
               </PrimaryButton>
               <SecondaryButton to="/credit-score/check">Check Free Credit Score</SecondaryButton>
             </div>

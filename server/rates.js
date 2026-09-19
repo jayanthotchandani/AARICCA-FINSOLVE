@@ -1,72 +1,85 @@
 import db from "./db.js";
 
-// Seed values match what was previously hardcoded in src/data.js — moving
-// them here means the site's live rates now live in the database and are
-// editable from the internal admin tool, without needing a developer to
-// change and redeploy code. The client still ships this same list as a
-// fallback (src/data.js) so the site never shows an empty state on first
-// paint, before the live /api/rates fetch resolves.
+// Seed values are researched market rates, current as of Sept 2026 (see
+// src/data.js's RATE_BENCHMARK_UPDATED_AT comment for sourcing notes) —
+// favoring whichever lenders currently publish the lowest starting rate per
+// category, PSU and private alike, so the site's live rates come from the
+// database and are editable from the internal admin tool, without needing a
+// developer to change and redeploy code. The client still ships this same
+// list as a fallback (src/data.js) so the site never shows an empty state on
+// first paint, before the live /api/rates fetch resolves.
 const SEED_RATES = {
   personal: [
-    ["IDFC FIRST Bank", 9.99],
+    ["Axis Bank", 8.75],
+    ["Bank of Maharashtra", 8.75],
     ["HDFC Bank", 9.99],
     ["ICICI Bank", 9.99],
-    ["Axis Bank", 9.99],
-    ["Bajaj Finserv", 10.0],
+    ["IDFC FIRST Bank", 9.99],
     ["State Bank of India", 10.0],
     ["Bank of Baroda", 10.15],
     ["Punjab National Bank", 10.25],
-    ["Tata Capital", 10.99],
-    ["Kotak Mahindra Bank", 10.99],
+    ["Bank of India", 10.85],
+    ["Yes Bank", 10.85],
   ],
   home: [
-    ["HDFC Bank", 7.2],
+    ["Bank of Maharashtra", 7.0],
+    ["Central Bank of India", 7.0],
+    ["Bank of India", 7.1],
+    ["Canara Bank", 7.15],
     ["Bank of Baroda", 7.2],
     ["State Bank of India", 7.25],
-    ["Bajaj Finserv", 7.4],
+    ["Punjab National Bank", 7.4],
+    ["UCO Bank", 7.5],
+    ["ICICI Bank", 7.55],
     ["Kotak Mahindra Bank", 7.6],
-    ["ICICI Bank", 7.65],
-    ["Punjab National Bank", 8.15],
-    ["Axis Bank", 8.35],
-    ["Tata Capital", 8.45],
-    ["IDFC FIRST Bank", 8.85],
   ],
   business: [
-    ["State Bank of India", 8.5],
-    ["Kotak Mahindra Bank", 10.0],
-    ["ICICI Bank", 10.25],
-    ["Punjab National Bank", 10.35],
-    ["HDFC Bank", 10.75],
-    ["Axis Bank", 11.49],
-    ["Tata Capital", 8.45],
-    ["Bajaj Finserv", 14.0],
+    ["Bank of Baroda", 8.15],
+    ["Indian Bank", 8.15],
+    ["Punjab National Bank", 8.25],
+    ["State Bank of India", 9.1],
+    ["Canara Bank", 9.25],
+    ["Bank of India", 9.35],
+    ["Union Bank of India", 9.4],
+    ["Kotak Mahindra Bank", 9.5],
+    ["Shriram Finance", 10.0],
+    ["South Indian Bank", 10.65],
   ],
   lap: [
-    ["Tata Capital", 8.45],
-    ["IDFC FIRST Bank", 8.75],
+    ["Canara Bank", 8.25],
     ["State Bank of India", 8.95],
-    ["HDFC Bank", 9.5],
-    ["Axis Bank", 9.5],
-    ["Kotak Mahindra Bank", 9.5],
-    ["ICICI Bank", 9.75],
+    ["HDFC Bank", 9.0],
+    ["IDFC FIRST Bank", 9.0],
+    ["Punjab National Bank", 9.05],
+    ["Axis Bank", 9.25],
+    ["Kotak Mahindra Bank", 9.25],
+    ["Bank of Baroda", 9.35],
+    ["Tata Capital", 10.1],
+    ["ICICI Bank", 10.6],
   ],
   education: [
-    ["State Bank of India", 8.05],
-    ["HDFC Bank", 9.5],
-    ["ICICI Bank", 9.5],
-    ["Axis Bank", 10.5],
+    ["Bank of Maharashtra", 6.85],
+    ["UCO Bank", 6.9],
+    ["IDBI Bank", 6.95],
+    ["Bank of India", 7.0],
+    ["Canara Bank", 7.25],
+    ["Punjab National Bank", 7.5],
+    ["Axis Bank", 8.0],
+    ["Bank of Baroda", 8.15],
+    ["ICICI Bank", 8.5],
+    ["State Bank of India", 9.4],
   ],
   msme: [
+    ["Bank of Baroda", 7.9],
+    ["State Bank of India", 8.0],
+    ["Punjab National Bank", 8.25],
+    ["Canara Bank", 8.45],
+    ["Bank of India", 8.6],
+    ["Union Bank of India", 8.75],
+    ["Indian Bank", 8.9],
+    ["Kotak Mahindra Bank", 9.5],
     ["HDFC Bank", 10.25],
     ["ICICI Bank", 10.78],
-    ["State Bank of India", 11.31],
-    ["Axis Bank", 11.83],
-    ["Kotak Mahindra Bank", 12.36],
-    ["Bank of Baroda", 12.89],
-    ["Punjab National Bank", 13.42],
-    ["Tata Capital", 13.94],
-    ["Bajaj Finserv", 14.47],
-    ["IDFC FIRST Bank", 15.0],
   ],
 };
 
