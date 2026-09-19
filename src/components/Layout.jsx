@@ -15,7 +15,7 @@ import { LOAN_TYPES } from "../data";
 import { AccordionPanel } from "./ui";
 
 const TICKER_ITEMS = [
-  { icon: PhoneCall, text: "Toll-Free 24×7 Support: 1800-AARICCA" },
+  { icon: PhoneCall, text: "24×7 Support: +91 93559 17598 / 0124-3191 7914" },
   { icon: Landmark, text: "Multi-Bank Distribution Partner: 140+ Scheduled Commercial Banks & NBFCs" },
   { icon: MapPin, text: "Pan-India Operations: Express Doorstep & Digital Advisory in 120+ Cities" },
   { icon: ShieldCheck, text: "Enterprise Security: ISO 27001:2025 Certified & 256-Bit SSL Encrypted" },
@@ -284,7 +284,10 @@ export function Footer() {
                 <Mail className="w-4 h-4 text-gold" /> sales@aaricca.com
               </li>
               <li className="flex items-center gap-2">
-                <PhoneCall className="w-4 h-4 text-gold" /> 1800-AARICCA (Toll Free)
+                <PhoneCall className="w-4 h-4 text-gold" /> +91 93559 17598 (Support)
+              </li>
+              <li className="flex items-center gap-2">
+                <PhoneCall className="w-4 h-4 text-gold" /> 0124-3191 7914 (Gurugram Office)
               </li>
             </ul>
           </div>
