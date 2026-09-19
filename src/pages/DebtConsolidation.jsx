@@ -68,14 +68,16 @@ const CONSOLIDATION_TESTIMONIALS = [
 
 function ConsolidationTestimonialCard({ t }) {
   return (
-    <figure className="bg-white rounded-2xl border border-teal/12 p-6">
-      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal bg-teal/8 px-2.5 py-1 rounded-full mb-3">
+    <figure className="h-full flex flex-col bg-white rounded-2xl border border-teal/12 p-6">
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal bg-teal/8 px-2.5 py-1 rounded-full mb-3 self-start">
         {t.product_tag} · {t.debt_count}
       </span>
-      <blockquote className="text-sm text-ink/75 leading-relaxed">&ldquo;{t.quote}&rdquo;</blockquote>
+      <blockquote className="flex-1 text-sm text-ink/75 leading-relaxed">&ldquo;{t.quote}&rdquo;</blockquote>
       <figcaption className="mt-4 pt-4 border-t border-teal/10">
-        <p className="text-sm font-semibold text-ink">{t.name}</p>
-        <p className="text-xs text-ink/55">{t.role_location}</p>
+        <p className="text-sm text-ink">
+          <span className="font-semibold">{t.name}</span>
+          <span className="text-ink/55"> · {t.role_location}</span>
+        </p>
       </figcaption>
       {t.emi_before && t.emi_after && (
         <div className="mt-4 grid grid-cols-2 gap-2 text-xs bg-surface rounded-lg p-3">
