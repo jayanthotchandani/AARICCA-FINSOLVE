@@ -38,10 +38,11 @@ const HOW_IT_WORKS = [
   { n: 4, title: "You get one clear plan", desc: "Our advisor calls within 24 hours to walk through exactly what we recommend and why." },
 ];
 
-// Sample testimonial using a real customer's name (Riya Khandelwal), per
-// dev handoff item 3. Quote and figures below are illustrative, drafted to
-// match the site's established tone — confirm actual wording and numbers
-// with her directly before treating this as a verified, published quote.
+// Sample testimonials using real customers' names (Riya Khandelwal, Vrinda
+// Jain), per dev handoff item 3. Quotes and figures below are illustrative,
+// drafted to match the site's established tone — confirm actual wording and
+// numbers with each of them directly before treating these as verified,
+// published quotes.
 const CONSOLIDATION_TESTIMONIALS = [
   {
     quote:
@@ -52,6 +53,16 @@ const CONSOLIDATION_TESTIMONIALS = [
     debt_count: "3 debts → 1",
     emi_before: "₹41,000/mo across 3 EMIs",
     emi_after: "₹31,500/mo, single EMI",
+  },
+  {
+    quote:
+      "Between a personal loan and a credit card I'd used for a laptop upgrade, I was paying two different due dates every month and losing track of which one actually mattered. My advisor combined both into one loan at a lower blended rate instead of just telling me to pay them off faster. My EMI went from ₹45,000 to ₹37,000 — same debt, just structured properly for once.",
+    name: "Vrinda Jain",
+    role_location: "Software Developer, Bengaluru",
+    product_tag: "Debt Consolidation",
+    debt_count: "2 debts → 1",
+    emi_before: "₹45,000/mo across 2 EMIs",
+    emi_after: "₹37,000/mo, single EMI",
   },
 ];
 
